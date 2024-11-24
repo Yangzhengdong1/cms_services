@@ -1,0 +1,29 @@
+{
+  "name": "cms-services",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "_moduleAliases": {
+    "@": "./src"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon ./src/main.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "dotenv": "^16.4.5",
+    "ejs": "^3.1.10",
+    "jsonwebtoken": "^9.0.2",
+    "koa": "^2.14.2",
+    "koa-bodyparser": "^4.4.0",
+    "koa-log4": "^2.3.2",
+    "koa-router": "^12.0.0",
+    "koa-views": "7.0.1",
+    "module-alias": "^2.2.3",
+    "mysql2": "^3.11.4"
+  }
+}
