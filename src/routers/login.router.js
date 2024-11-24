@@ -39,6 +39,8 @@ const login = ctx => {
 		isActive,
     phone
 	} = ctx.dbUserInfo;
+
+  // 颁发 token
 	const token = createToken({ wid, username, departmentId, roleId, isActive });
 	if (!token) {
     createError(INTERNAL_PROBLEMS, ctx);

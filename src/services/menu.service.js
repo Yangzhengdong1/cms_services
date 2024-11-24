@@ -46,7 +46,9 @@ class MenuService {
 	async create(params) {
 		const { name, icon, url, isVisible, orderNum, parentId } = params;
 
-		const statement = `INSERT INTO menus(name, icon, url, parent_id, order_num, is_visible) VALUES(?, ?, ?, ?, ?, ?);`;
+		const statement = `
+      INSERT INTO menus(name, icon, url, parent_id, order_num, is_visible) VALUES(?, ?, ?, ?, ?, ?);
+    `;
 		try {
 			const [result] = await connection.execute(statement, [
 				name,
@@ -63,8 +65,24 @@ class MenuService {
 		}
 	}
 
+	async remove(id) {
+		const statement = `
+      DELETE FROM menus WHERE wid = ?;
+    `;
+
+		try {
+			const [result] = await connection.execute(statement, [id]);
+			return result;
+		} catch (error) {
+			console.log(error, "删除菜单出错-db");
+			return false;
+		}
+	}
+
 	async queryMenuExist(wid) {
-		const statement = `SELECT * FROM menus WHERE wid = ?`;
+		const statement = `
+      SELECT * FROM menus WHERE wid = ?
+    `;
 		try {
 			const [result] = await connection.execute(statement, [wid]);
 			return result;

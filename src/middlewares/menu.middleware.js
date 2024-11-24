@@ -77,7 +77,20 @@ const verifyCreate = async (ctx, next) => {
 	await next();
 };
 
+const verifyDelete = async (ctx, next) => {
+  const { id } = ctx.params;
+
+  // 判断是否有这个菜单id
+	const flag = await verifyIdExist(id, MENU_UPDATE_WID_NOT_FOUND, ctx);
+  if (!flag) {
+    return;
+  }
+
+  await next();
+};
+
 module.exports = {
 	verifyUpdate,
-	verifyCreate
+	verifyCreate,
+  verifyDelete
 };
