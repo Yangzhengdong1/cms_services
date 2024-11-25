@@ -1,0 +1,4 @@
+# Apply settings to all files
+[*]
+indent_style = space    # 使用空格
+indent_size = 2         # 每个缩进为 4 个空格
