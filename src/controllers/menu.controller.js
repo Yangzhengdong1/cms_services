@@ -3,24 +3,24 @@ const {
 	getMenu,
 	update,
 	queryMenuExist,
-	create
+	create,
+  remove
 } = require("../services/menu.service");
 const { arrayToTree } = require("../utils/format");
 
 class MenuCoutroller {
-	async getUserMenu(ctx) {
-		const { departmentId } = ctx.auth.userInfo;
-		const result = await getMenu(departmentId);
+	async createMenu(ctx) {
+		const { createParams } = ctx.menu;
+
+		const result = await create(createParams);
 		if (!result) {
 			createError(INTERNAL_PROBLEMS, ctx);
 			return;
 		}
-		const tree = arrayToTree(result);
 
 		ctx.body = {
 			code: 0,
-			data: tree,
-			message: "查询成功~"
+			message: "创建菜单成功~"
 		};
 	}
 
@@ -37,9 +37,10 @@ class MenuCoutroller {
 		};
 	}
 
-	async createMenu(ctx) {
-		const { createParams } = ctx.menu;
-		const result = await create(createParams);
+	async deleteMenu(ctx) {
+		const { id } = ctx.params;
+		const result = await remove(id);
+
 		if (!result) {
 			createError(INTERNAL_PROBLEMS, ctx);
 			return;
@@ -47,7 +48,24 @@ class MenuCoutroller {
 
 		ctx.body = {
 			code: 0,
-			message: "创建菜单成功~"
+			message: "删除菜单成功~"
+		};
+	}
+
+
+  async getUserMenu(ctx) {
+		const { departmentId } = ctx.auth.userInfo;
+		const result = await getMenu(departmentId);
+		if (!result) {
+			createError(INTERNAL_PROBLEMS, ctx);
+			return;
+		}
+		const tree = arrayToTree(result);
+
+		ctx.body = {
+			code: 0,
+			data: tree,
+			message: "查询成功~"
 		};
 	}
 

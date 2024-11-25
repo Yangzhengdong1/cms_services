@@ -1,7 +1,7 @@
 const KoaRouter = require("koa-router");
 
 const { queryUserExist } = require("../services/user.service");
-const { passwordVerify } = require("../middlewares/auth.middleware");
+const { passwordVerify, authVerify } = require("../middlewares/auth.middleware");
 
 const { LOGIN_ARGUMENT_IS_NOT_EMPTY } = require("../constant/messages");
 const { createError, USER_NOT_FOUND, INTERNAL_PROBLEMS } = require("../constant/error-types");
@@ -39,6 +39,8 @@ const login = ctx => {
 		isActive,
     phone
 	} = ctx.dbUserInfo;
+
+  // 颁发 token
 	const token = createToken({ wid, username, departmentId, roleId, isActive });
 	if (!token) {
     createError(INTERNAL_PROBLEMS, ctx);
@@ -56,5 +58,6 @@ const login = ctx => {
 };
 
 loginRouter.post("/login", loginVerify, passwordVerify, login);
+loginRouter.get("/valid-token", authVerify, async ctx => (ctx.body = "token 有效~"));
 
 module.exports = loginRouter;
