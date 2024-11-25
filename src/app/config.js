@@ -19,6 +19,7 @@ dotenv.config({ path: devPath });
 module.exports = {
 	SERVICE_PROT,
 	SERVICE_NAME,
+  SERVICE_HOST,
 	MYSQL_HOST,
 	MYSQL_PORT,
 	MYSQL_USER,

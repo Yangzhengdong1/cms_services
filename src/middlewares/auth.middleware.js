@@ -32,6 +32,7 @@ const authVerify = async (ctx, next) => {
 	}
 	const token = authorization.replace("Bearer ", "");
 	const result = jwt.verifyToken(token);
+
 	if (!result) {
 		createError(UNAUTHORIZED, ctx);
 		return;
