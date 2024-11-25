@@ -69,6 +69,20 @@ class MenuCoutroller {
 		};
 	}
 
+  async getMenuAll(ctx) {
+		const result = await getMenu();
+		if (!result) {
+			createError(INTERNAL_PROBLEMS, ctx);
+			return;
+		}
+
+		ctx.body = {
+			code: 0,
+			data: result,
+			message: "查询成功~"
+		};
+	}
+
 	async verifyIdExist(id, message, ctx) {
 		let flag = true;
 		const result = await queryMenuExist(id);

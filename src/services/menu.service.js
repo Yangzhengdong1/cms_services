@@ -2,15 +2,22 @@ const connection = require("../app/database");
 
 class MenuService {
 	async getMenu(departmentId) {
-		const statement = `
+		let values = [];
+		let statement = `
       SELECT
-        menus.wid, menus.name, icon, url, parent_id AS parentId, menu_id AS menuId, DATE_FORMAT(menus.createAt, '%Y-%m-%d %H:%i:%s') AS createTime, DATE_FORMAT(menus.updateAt, '%Y-%m-%d %H:%i:%s') AS updateTime
+        menus.wid, menus.name, icon, url, parent_id AS parentId, DATE_FORMAT(menus.createAt, '%Y-%m-%d %H:%i:%s') AS createTime, DATE_FORMAT(menus.updateAt, '%Y-%m-%d %H:%i:%s') AS updateTime
       FROM menus 
-      JOIN department_menus dm 
-      ON menus.wid = dm.menu_id
-      WHERE dm.department_id = ?;`;
+    `;
+
+		if (departmentId) {
+			statement += `
+        JOIN department_menus dm 
+        ON menus.wid = dm.menu_id WHERE dm.department_id = ?;`;
+			values = [departmentId];
+		}
+
 		try {
-			const [result] = await connection.execute(statement, [departmentId]);
+			const [result] = await connection.execute(statement, values);
 			return result;
 		} catch (error) {
 			console.log(error, "查询用户菜单出错");

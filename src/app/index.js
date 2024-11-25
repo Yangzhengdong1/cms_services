@@ -15,7 +15,8 @@ const { globalLogger } = require("@/utils/log4js");
 const templateRouter = require("@/routers/template");
 const userRouter = require("@/routers/user.router");
 const loginRouter = require("@/routers/login.router");
-const menuRouter = require("@/routers/menu.route");
+const menuRouter = require("@/routers/menu.router");
+const permRouter = require("@/routers/permission.router");
 
 const app = new Koa();
 
@@ -33,6 +34,8 @@ app.use(loginRouter.routes());
 app.use(loginRouter.allowedMethods());
 app.use(menuRouter.routes());
 app.use(menuRouter.allowedMethods());
+app.use(permRouter.routes());
+app.use(permRouter.allowedMethods());
 
 app.on("error", handleError);
 app.on("message", handleMessage);
