@@ -1,6 +1,6 @@
 const ERROR_INCORRECT_USERNAME_OR_PASSWORD = "用户名或密码错误！";
 const CREATE_USER_ARGUMENT_IS_NOT_EMPTY =
-	"用户名/密码/手机号/角色ID/部门ID为必传参数!";
+	"用户名/密码/手机号为必传参数!";
 const LOGIN_ARGUMENT_IS_NOT_EMPTY = "用户名/密码不能为空!";
 const MENU_UPDATE_ARGUMENT_IS_NOT_EMPTY = "菜单名称/wid不能为空！";
 const MENU_UPDATE_WID_NOT_FOUND = "wid不存在！";
@@ -9,6 +9,8 @@ const MENU_UPDATE_ID_REPETITIVE = "wid 与 parentId重复！";
 
 const PERM_CREATE_ARGUMENT_IS_NOT_EMPTY = "权限名称不能为空！";
 const PERM_CREATE_NAME_IS_EXIST = "权限名称重复！";
+
+const DICT_TABLE_NOT_FOUND = "字典表不存在！";
 
 
 module.exports = {
@@ -21,5 +23,7 @@ module.exports = {
   MENU_UPDATE_ID_REPETITIVE,
 
   PERM_CREATE_ARGUMENT_IS_NOT_EMPTY,
-  PERM_CREATE_NAME_IS_EXIST
+  PERM_CREATE_NAME_IS_EXIST,
+
+  DICT_TABLE_NOT_FOUND
 };

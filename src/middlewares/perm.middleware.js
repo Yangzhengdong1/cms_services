@@ -5,6 +5,11 @@ const {
 	PERM_CREATE_NAME_IS_EXIST
 } = require("@/constant/messages");
 
+/**
+ * @description: 处理权限创建参数（权限名称不允许重复/必填参数：name）
+ * @param {*} ctx
+ * @param {*} next
+ */
 const verifyCreate = async (ctx, next) => {
 	const { name, description } = ctx.request.body;
 	if (!name) {
@@ -12,7 +17,7 @@ const verifyCreate = async (ctx, next) => {
 		return;
 	}
 
-  // 判断权限名称是否已存在
+	// 判断权限名称是否已存在
 	const result = await queryPermission("name", name);
 	if (result) {
 		ctx.app.emit("message", PERM_CREATE_NAME_IS_EXIST, ctx);

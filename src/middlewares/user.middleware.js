@@ -3,14 +3,14 @@ const {
 	createError,
 	ACCOUNT_ALREADY_EXISTS,
 	INTERNAL_PROBLEMS,
-  NO_PERMISSION
+	NO_PERMISSION
 } = require("../constant/error-types");
 const { hashEncryption } = require("../utils/bcrypt");
 
 const { queryUserExist } = require("../services/user.service");
 
 /**
- * @description: 校验必填参数/用户是否已存在
+ * @description: 处理用户创建参数（不允许重名/必填参数：name、password、phone）
  * @param {*} ctx
  * @param {*} next
  */
@@ -21,7 +21,7 @@ const verifyCreate = async (ctx, next) => {
 		ctx.request.body;
 
 	// 判断必传参数
-	const requiredFields = [name, password, phone, departmentId, roleId];
+	const requiredFields = [name, password, phone];
 	const flag = requiredFields.every(item => !!item === true);
 	if (!flag) {
 		ctx.app.emit("message", CREATE_USER_ARGUMENT_IS_NOT_EMPTY, ctx);
@@ -44,8 +44,8 @@ const verifyCreate = async (ctx, next) => {
 		username: name,
 		password: hashEncryption(password),
 		phone,
-		departmentId,
-		roleId,
+		departmentId: departmentId ? departmentId : null,
+		roleId: roleId ? roleId : null,
 		isActive: isActive ? isActive : 1
 	};
 
@@ -54,18 +54,23 @@ const verifyCreate = async (ctx, next) => {
 	await next();
 };
 
+/**
+ * @description: 处理查询用户信息参数（必填参数：id）
+ * @param {*} ctx
+ * @param {*} next
+ */
 const verifyInfo = async (ctx, next) => {
 	const { id } = ctx.params;
-  const { wid } = ctx.auth.userInfo;
+	const { wid } = ctx.auth.userInfo;
 
-  // 这里之后需要查询权限，看当前用户是否有查询用户信息(query_user_info)的权限
+	// todo:这里之后需要查询权限，看当前角色是否有查询用户信息(query_user_info)的权限
 
-  if (id !== wid) {
-    createError(NO_PERMISSION, ctx);
-    return;
-  }
+	if (id !== wid) {
+		createError(NO_PERMISSION, ctx);
+		return;
+	}
 
-  await next();
+	await next();
 };
 
 module.exports = {

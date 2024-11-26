@@ -16,10 +16,10 @@ class PermissionService {
     }
   }
 
-  async queryPermission(filedKey, filedValue) {
-    const statement = `SELECT * FROM permissions WHERE ${filedKey} = ?;`;
+  async queryPermission(fieldKey, fieldValue) {
+    const statement = `SELECT * FROM permissions WHERE ${fieldKey} = ?;`;
     try {
-      const [ result ] = await connection.execute(statement, [filedValue]);
+      const [ result ] = await connection.execute(statement, [fieldValue]);
       return result;
     } catch (error) {
       console.log(error, "查询权限出错-db");

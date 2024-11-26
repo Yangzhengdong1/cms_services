@@ -98,6 +98,32 @@ class MenuService {
 			return false;
 		}
 	}
+
+	async getMenuList(params) {
+		let values = [];
+		let statement = `
+      SELECT 
+        wid, name, icon, url, parent_id AS parentId, order_num AS orderNum, is_visible AS isVisible,
+        DATE_FORMAT(createAt, '%Y-%m-%d %H:%i:%s') AS createTime,
+        DATE_FORMAT(updateAt, '%Y-%m-%d %H:%i:%s') AS updateTime 
+      FROM menus
+      ORDER BY createAt DESC
+    `;
+		const { limit, offset } = params;
+
+		if (Object.keys(params).length !== 0) {
+			statement += " LIMIT ? OFFSET ?;";
+			values = [limit, offset];
+		}
+
+		try {
+			const [result] = await connection.execute(statement, values);
+			return result;
+		} catch (error) {
+			console.log(error, "查询菜单分页出错-db");
+			return false;
+		}
+	}
 }
 
 module.exports = new MenuService();

@@ -4,7 +4,8 @@ const {
 	update,
 	queryMenuExist,
 	create,
-  remove
+	remove,
+	getMenuList
 } = require("../services/menu.service");
 const { arrayToTree } = require("../utils/format");
 
@@ -52,8 +53,11 @@ class MenuCoutroller {
 		};
 	}
 
-
-  async getUserMenu(ctx) {
+	/**
+	 * @description: 查询用户所属部门的菜单树
+	 * @param {*} ctx
+	 */
+	async getUserMenu(ctx) {
 		const { departmentId } = ctx.auth.userInfo;
 		const result = await getMenu(departmentId);
 		if (!result) {
@@ -69,8 +73,12 @@ class MenuCoutroller {
 		};
 	}
 
-  async getMenuAll(ctx) {
-		const result = await getMenu();
+	/**
+	 * @description: 分页查询菜单列表
+	 * @param {*} ctx
+	 */
+	async getMenuAll(ctx) {
+		const result = await getMenuList(ctx.menu.getListParams);
 		if (!result) {
 			createError(INTERNAL_PROBLEMS, ctx);
 			return;
@@ -78,11 +86,18 @@ class MenuCoutroller {
 
 		ctx.body = {
 			code: 0,
+			total: result.length,
 			data: result,
 			message: "查询成功~"
 		};
 	}
 
+	/**
+	 * @description: 根据 id 查询当前菜单是否存在
+	 * @param {*} id
+	 * @param {*} message
+	 * @param {*} ctx
+	 */
 	async verifyIdExist(id, message, ctx) {
 		let flag = true;
 		const result = await queryMenuExist(id);

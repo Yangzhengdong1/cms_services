@@ -14,7 +14,7 @@ const { globalLogger } = require("@/utils/log4js");
 // 导入路由
 const templateRouter = require("@/routers/template");
 const userRouter = require("@/routers/user.router");
-const loginRouter = require("@/routers/login.router");
+const publicRouter = require("@/routers/public.router");
 const menuRouter = require("@/routers/menu.router");
 const permRouter = require("@/routers/permission.router");
 
@@ -30,8 +30,8 @@ app.use(templateRouter.routes());
 app.use(templateRouter.allowedMethods());
 app.use(userRouter.routes());
 app.use(userRouter.allowedMethods());
-app.use(loginRouter.routes());
-app.use(loginRouter.allowedMethods());
+app.use(publicRouter.routes());
+app.use(publicRouter.allowedMethods());
 app.use(menuRouter.routes());
 app.use(menuRouter.allowedMethods());
 app.use(permRouter.routes());
