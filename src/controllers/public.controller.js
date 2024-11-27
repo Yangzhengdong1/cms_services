@@ -1,12 +1,20 @@
 const { createError, INTERNAL_PROBLEMS } = require("../constant/error-types");
 const { createToken } = require("../utils/jwt");
 
-const { queryDictTable } = require("../services/public.service");
+const { queryDictTable, rolePerm } = require("../services/public.service");
 
 class PublicController {
 	login(ctx) {
-		const { wid, username, departmentId, roleId, isActive, phone } =
-			ctx.dbUserInfo;
+		const {
+			wid,
+			username,
+			departmentId,
+			roleId,
+			isActive,
+			phone,
+			roleName,
+			departmentName
+		} = ctx.dbUserInfo;
 
 		// 颁发 token
 		const token = createToken({
@@ -14,7 +22,9 @@ class PublicController {
 			username,
 			departmentId,
 			roleId,
-			isActive
+			isActive,
+			roleName,
+			departmentName
 		});
 		if (!token) {
 			createError(INTERNAL_PROBLEMS, ctx);
@@ -36,7 +46,7 @@ class PublicController {
 	 * @param {*} ctx
 	 */
 	async getDictTable(ctx) {
-		const { name } = ctx.params;
+		const { name } = ctx.public.dictParams;
 		const result = await queryDictTable(name);
 
 		if (!result) {
@@ -47,7 +57,24 @@ class PublicController {
 		ctx.body = {
 			code: 0,
 			data: result,
+			tbName: name,
 			message: "查询成功~"
+		};
+	}
+
+	async rolePermRelevance(ctx) {
+		const { rolePermParams } = ctx.public;
+
+		const result = await rolePerm(rolePermParams);
+
+		if (!result) {
+			createError(INTERNAL_PROBLEMS, ctx);
+			return;
+		}
+
+		ctx.body = {
+			code: 0,
+			message: "角色权限关联成功~"
 		};
 	}
 }

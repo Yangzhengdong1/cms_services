@@ -23,16 +23,18 @@ class UserController {
 			return;
 		}
 
-    const { wid, username, phone, roleId, departmentId, createTime, updateTime } = result[0];
+    const { wid, username, phone, roleId, departmentId, createTime, updateTime, roleName, departmentName } = result[0];
 
 		ctx.body = {
 			code: 0,
 			data: {
-				wid,
 				username,
-				phone,
+        roleName,
+        departmentName,
+				wid,
 				roleId,
 				departmentId,
+				phone,
 				createTime,
 				updateTime
 			},
