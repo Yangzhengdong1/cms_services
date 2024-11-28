@@ -17,6 +17,8 @@ const userRouter = require("@/routers/user.router");
 const publicRouter = require("@/routers/public.router");
 const menuRouter = require("@/routers/menu.router");
 const permRouter = require("@/routers/permission.router");
+const deptRouter = require("@/routers/department.router");
+const roleRouter = require("@/routers/role.router");
 
 const app = new Koa();
 
@@ -36,6 +38,10 @@ app.use(menuRouter.routes());
 app.use(menuRouter.allowedMethods());
 app.use(permRouter.routes());
 app.use(permRouter.allowedMethods());
+app.use(deptRouter.routes());
+app.use(deptRouter.allowedMethods());
+app.use(roleRouter.routes());
+app.use(roleRouter.allowedMethods());
 
 app.on("error", handleError);
 app.on("message", handleMessage);

@@ -20,7 +20,7 @@ const { queryRole } = require("../services/role.service");
  * @param {*} next
  */
 const loginVerify = async (ctx, next) => {
-	console.log("loginMiddleware: loginVerify~");
+	console.log("登录校验 Middleware: loginVerify~");
 
 	const { username, password } = ctx.request.body;
 	if (!username || !password) {
@@ -46,6 +46,8 @@ const loginVerify = async (ctx, next) => {
  * @param {*} next
  */
 const dictVerify = async (ctx, next) => {
+	console.log("字典表校验 Middleware: dictVerify~");
+
 	const { name } = ctx.params;
 	const dictTableName = dictTableMap[name];
 
@@ -60,6 +62,8 @@ const dictVerify = async (ctx, next) => {
 };
 
 const rolePermVerify = async (ctx, next) => {
+	console.log("角色权限关联校验 Middleware: rolePermVerify~");
+
 	const { roleId, permissions } = ctx.request.body;
 	if (!roleId || !permissions?.length) {
 		ctx.app.emit("message", ROLE_PERM_ARGUMENT_IS_NOT_EMPTY, ctx);
@@ -78,12 +82,18 @@ const rolePermVerify = async (ctx, next) => {
 		return;
 	}
 
-	const params = permissions.map(item => {
-    const roleName = result[0].name, permissionName = item.name, permissionId = item.wid;
-		return [roleId, roleName, permissionId, permissionName];
-	});
+	const params = {
+		roleId,
+		roleName: result[0].name,
+		permissions
+	};
 
-  ctx.public = { rolePermParams: params };
+	// const params = permissions.map(item => {
+	//   const roleName = result[0].name, permissionName = item.name, permissionId = item.wid;
+	// 	return [roleId, roleName, permissionId, permissionName];
+	// });
+
+	ctx.public = { rolePermParams: params };
 
 	await next();
 };

@@ -14,6 +14,8 @@ const { verifyIdExist } = require("../controllers/menu.controller");
  * @param {*} next
  */
 const verifyUpdate = async (ctx, next) => {
+  console.log("菜单校验 Middleware: verifyUpdate~");
+
 	const { name, wid, icon, url, isVisible, orderNum, parentId } =
 		ctx.request.body;
 
@@ -60,11 +62,13 @@ const verifyUpdate = async (ctx, next) => {
 };
 
 /**
- * @description: 处理菜单创建参数（允许重名/必填参数：name、wid）
+ * @description: 处理菜单创建参数（允许重名/必填参数：name）
  * @param {*} ctx
  * @param {*} next
  */
 const verifyCreate = async (ctx, next) => {
+  console.log("菜单校验 Middleware: verifyCreate~");
+
 	const { name, icon, url, isVisible, orderNum, parentId } = ctx.request.body;
 	if (!name) {
 		ctx.app.emit("message", MENU_UPDATE_ARGUMENT_IS_NOT_EMPTY, ctx);
@@ -102,6 +106,8 @@ const verifyCreate = async (ctx, next) => {
  * @param {*} next
  */
 const verifyDelete = async (ctx, next) => {
+  console.log("菜单校验 Middleware: verifyDelete~");
+
 	const { id } = ctx.params;
 
 	// 判断是否有这个菜单id
@@ -119,6 +125,8 @@ const verifyDelete = async (ctx, next) => {
  * @param {*} next
  */
 const verifyMenuAll = async (ctx, next) => {
+  console.log("菜单校验 Middleware: verifyMenuAll~");
+
 	let { pageSize: offset, pageNum: limit } = ctx.query;
 	let params = {};
 

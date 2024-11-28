@@ -11,6 +11,8 @@ const {
  * @param {*} next
  */
 const verifyCreate = async (ctx, next) => {
+  console.log("用户权限校验 Middleware: verifyCreate~");
+
 	const { name, description } = ctx.request.body;
 	if (!name) {
 		ctx.app.emit("message", PERM_CREATE_ARGUMENT_IS_NOT_EMPTY, ctx);

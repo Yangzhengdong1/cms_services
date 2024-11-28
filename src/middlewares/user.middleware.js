@@ -1,8 +1,8 @@
 const {
 	CREATE_USER_ARGUMENT_IS_NOT_EMPTY,
 	ROLE_NOT_FOUND,
-	DEPM_NOT_FOUND,
-  ROLE_AND_DEPM_DO_NOT_MATCH
+	DEPT_NOT_FOUND,
+	ROLE_AND_DEPT_DO_NOT_MATCH
 } = require("@/constant/messages");
 const {
 	createError,
@@ -14,7 +14,7 @@ const { hashEncryption } = require("../utils/bcrypt");
 
 const { queryUserExist } = require("../services/user.service");
 const { queryRole } = require("../services/role.service");
-const { queryDepartment } = require("../services/depm.service");
+const { queryDepartment } = require("../services/dept.service");
 
 /**
  * @description: 处理用户创建参数（不允许重名/必填参数：name、password、phone）
@@ -22,7 +22,7 @@ const { queryDepartment } = require("../services/depm.service");
  * @param {*} next
  */
 const verifyCreate = async (ctx, next) => {
-	console.log("userMiddleware: verifyCreate~");
+	console.log("用户校验 Middleware: verifyCreate~");
 
 	const { name, password, phone, departmentId, roleId, isActive } =
 		ctx.request.body;
@@ -38,7 +38,7 @@ const verifyCreate = async (ctx, next) => {
 	// 判断数据库中是否已有当前用户
 	const result = await queryUserExist("name", name);
 	let roleResult,
-		depmResult,
+		deptResult,
 		roleName = null,
 		departmentName = null;
 
@@ -67,25 +67,25 @@ const verifyCreate = async (ctx, next) => {
 
 	// 查询所属部门名称
 	if (departmentId) {
-		depmResult = await queryDepartment("wid", departmentId);
+		deptResult = await queryDepartment("wid", departmentId);
 		if (
-			Object.prototype.toString.call(depmResult) === "[object Array]" &&
-			depmResult.length > 0
+			Object.prototype.toString.call(deptResult) === "[object Array]" &&
+			deptResult.length > 0
 		) {
-			departmentName = depmResult[0].name;
+			departmentName = deptResult[0].name;
 		} else {
-			ctx.app.emit("message", DEPM_NOT_FOUND, ctx);
+			ctx.app.emit("message", DEPT_NOT_FOUND, ctx);
 			return;
 		}
 	}
 
 	// 查询当前角色是否在对应的部门下
 	if (roleName && roleResult[0].department_id !== departmentId) {
-		ctx.app.emit("message", ROLE_AND_DEPM_DO_NOT_MATCH, ctx);
+		ctx.app.emit("message", ROLE_AND_DEPT_DO_NOT_MATCH, ctx);
 		return;
 	}
 
-	if (result === false || roleResult === false || depmResult === false) {
+	if (result === false || roleResult === false || deptResult === false) {
 		createError(INTERNAL_PROBLEMS, ctx);
 		return;
 	}
@@ -112,6 +112,8 @@ const verifyCreate = async (ctx, next) => {
  * @param {*} next
  */
 const verifyInfo = async (ctx, next) => {
+	console.log("用户校验 Middleware: verifyInfo~");
+
 	const { id } = ctx.params;
 	const { wid } = ctx.auth.userInfo;
 

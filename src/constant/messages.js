@@ -14,9 +14,11 @@ const DICT_TABLE_NOT_FOUND = "字典表不存在！";
 const ROLE_PERM_ARGUMENT_IS_NOT_EMPTY = "角色id/权限列表参数不能为空";
 const ROLE_NOT_FOUND = "角色不存在！";
 
-const DEPM_NOT_FOUND = "部门不存在！";
+const DEPT_NOT_FOUND = "部门不存在！";
+const DEPT_NAME_IS_EXIST = "部门名称重复！";
+const DEPT_CREATE_ARGUMENT_IS_NOT_EMPTY = "部门名称不能为空！";
 
-const ROLE_AND_DEPM_DO_NOT_MATCH = "角色与部门不匹配！";
+const ROLE_AND_DEPT_DO_NOT_MATCH = "角色与部门不匹配！";
 
 module.exports = {
 	ERROR_INCORRECT_USERNAME_OR_PASSWORD,
@@ -35,7 +37,9 @@ module.exports = {
 	ROLE_PERM_ARGUMENT_IS_NOT_EMPTY,
 	ROLE_NOT_FOUND,
 
-	DEPM_NOT_FOUND,
+	DEPT_NOT_FOUND,
+	DEPT_CREATE_ARGUMENT_IS_NOT_EMPTY,
+  DEPT_NAME_IS_EXIST,
 
-	ROLE_AND_DEPM_DO_NOT_MATCH
+	ROLE_AND_DEPT_DO_NOT_MATCH
 };

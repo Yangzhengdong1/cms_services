@@ -48,7 +48,7 @@ const authVerify = async (ctx, next) => {
  * @param {*} next
  */
 const permVerify = async (ctx, next) => {
-  console.log("权限校验 middleware: permVerify");
+  console.log("权限校验 Middleware: permVerify");
 
 	const { roleId, permName } = ctx.auth.userInfo;
   const result = await queryRolePermission(roleId);
@@ -73,7 +73,7 @@ const permVerify = async (ctx, next) => {
  * @param {*} next
  */
 const passwordVerify = async (ctx, next) => {
-	console.log("loginMiddleware: passwordVerify~");
+	console.log("权限校验 Middleware: passwordVerify~");
 
 	const { username, password } = ctx.request.body;
 	const { username: name, password: pwd } = ctx.dbUserInfo;
