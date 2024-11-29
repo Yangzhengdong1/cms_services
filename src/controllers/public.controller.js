@@ -1,7 +1,7 @@
 const { createError, INTERNAL_PROBLEMS } = require("../constant/error-types");
 const { createToken } = require("../utils/jwt");
 
-const { queryDictTable, rolePerm } = require("../services/public.service");
+const { queryDictTable, rolePerm, menuDept } = require("../services/public.service");
 
 class PublicController {
 	login(ctx) {
@@ -31,11 +31,12 @@ class PublicController {
 			return;
 		}
 		ctx.body = {
-			code: 200,
+			code: 0,
 			data: {
-				token,
+        id: wid,
 				username,
-				phone
+				phone,
+				token
 			},
 			message: "登录成功~"
 		};
@@ -77,6 +78,22 @@ class PublicController {
 			message: "角色权限关联成功~"
 		};
 	}
+
+  async menuDeptRelevance(ctx) {
+    const { menuDeptParams } = ctx.public;
+
+    const result = await menuDept(menuDeptParams);
+
+    if (!result) {
+      createError(INTERNAL_PROBLEMS, ctx);
+      return;
+    }
+
+    ctx.body = {
+      code: 0,
+      message: "部门菜单关联成功~"
+    };
+  }
 }
 
 module.exports = new PublicController();

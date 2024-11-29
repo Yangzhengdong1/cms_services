@@ -7,12 +7,15 @@ const {
 	LOGIN_ARGUMENT_IS_NOT_EMPTY,
 	DICT_TABLE_NOT_FOUND,
 	ROLE_PERM_ARGUMENT_IS_NOT_EMPTY,
-	ROLE_NOT_FOUND
+	ROLE_NOT_FOUND,
+  DEPT_NOT_FOUND,
+  MENU_DEPT_ARGUMENT_IS_NOT_EMPTY
 } = require("../constant/messages");
 const dictTableMap = require("../constant/dict_table");
 
 const { queryUserExist } = require("../services/user.service");
 const { queryRole } = require("../services/role.service");
+const { queryDepartment } = require("../services/dept.service");
 
 /**
  * @description: 处理登录参数（不允许重名/必填参数：name、password）
@@ -34,6 +37,12 @@ const loginVerify = async (ctx, next) => {
 		createError(USER_NOT_FOUND, ctx);
 		return;
 	}
+
+  // 判断用户是否激活
+  if (result?.isActive !== 1) {
+    createError(USER_NOT_FOUND, ctx);
+    return;
+  }
 
 	ctx.dbUserInfo = result;
 
@@ -98,8 +107,37 @@ const rolePermVerify = async (ctx, next) => {
 	await next();
 };
 
+const menuDeptVerify = async (ctx, next) => {
+	console.log("菜单部门关联校验 Middleware: menuDeptVerify~");
+
+  const { departmentId, menus } = ctx.request.body;
+  if (!departmentId || !menus?.length) {
+    ctx.app.emit("message", MENU_DEPT_ARGUMENT_IS_NOT_EMPTY, ctx);
+    return;
+  }
+
+  // 查询是否有当前这个部门
+  const result = await queryDepartment("wid", departmentId);
+
+  if (!Array.isArray(result) && result.length <= 0) {
+    ctx.app.emit("message", DEPT_NOT_FOUND, ctx);
+    return;
+  }
+
+  const params = {
+    departmentId,
+    departmentName: result[0].name,
+    menus
+  };
+
+  ctx.public = { menuDeptParams: params };
+
+  await next();
+};
+
 module.exports = {
 	loginVerify,
 	dictVerify,
-	rolePermVerify
+	rolePermVerify,
+  menuDeptVerify
 };

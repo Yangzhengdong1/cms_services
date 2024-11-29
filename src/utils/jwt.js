@@ -9,7 +9,6 @@ const createOptions = { expiresIn: 60 * 60 * 24, algorithm: "RS256" };
 class JWT {
 	createToken(payload, options = createOptions) {
 		try {
-			console.log(options);
 			return jwt.sign(payload, PRIVATE_KEY, options);
 		} catch (err) {
 			console.log(err, "颁发 token 出错");
