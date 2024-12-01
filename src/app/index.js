@@ -1,10 +1,13 @@
+const path = require("path");
+
 const Koa = require("koa");
 const bodyParser = require("koa-bodyparser");
 const koaViews = require("koa-views");
+const KoaStatic = require("koa-static");
+const mount = require("koa-mount");
 
 require("./database");
 require("module-alias/register");
-
 
 const { handleError } = require("@/app/error-handle");
 const handleMessage = require("@/app/message-handle");
@@ -19,6 +22,7 @@ const menuRouter = require("@/routers/menu.router");
 const permRouter = require("@/routers/permission.router");
 const deptRouter = require("@/routers/department.router");
 const roleRouter = require("@/routers/role.router");
+const uploadRouter = require("@/routers/upload.router");
 
 const app = new Koa();
 
@@ -26,6 +30,9 @@ const app = new Koa();
 app.use(koaViews(VIEWS_PATH, { extension: "ejs" }));
 app.use(bodyParser());
 app.use(globalLogger());
+// 开启静态资源服务，提供 uploads 文件夹的访问
+// mount: 提供静态服务访问前缀， koa-static prefix属性被废弃
+app.use(mount("/uploads/imgs/", KoaStatic(path.resolve(__dirname, "../../uploads/imgs/"))));
 
 // 注册路由
 app.use(templateRouter.routes());
@@ -42,6 +49,8 @@ app.use(deptRouter.routes());
 app.use(deptRouter.allowedMethods());
 app.use(roleRouter.routes());
 app.use(roleRouter.allowedMethods());
+app.use(uploadRouter.routes());
+app.use(uploadRouter.allowedMethods());
 
 app.on("error", handleError);
 app.on("message", handleMessage);

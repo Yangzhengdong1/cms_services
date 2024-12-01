@@ -34,7 +34,7 @@ class UserService {
 	async queryUserExist(fieldKey, fieldValue) {
 		let statement = `
       SELECT 
-        wid, name AS username, password, phone, department_id AS departmentId, role_id AS roleId, role_name AS roleName, department_name AS departmentName,
+        wid, name AS username, password, phone + 0 AS phone, department_id AS departmentId, role_id AS roleId, role_name AS roleName, department_name AS departmentName,
         is_active AS isActive,
         DATE_FORMAT(createAt, '%Y-%m-%d %H:%i:%s') AS createTime,
         DATE_FORMAT(updateAt, '%Y-%m-%d %H:%i:%s') AS updateTime

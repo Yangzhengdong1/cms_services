@@ -8,7 +8,7 @@ const { getUserMenu, updateMenu, createMenu, deleteMenu, getMenuAll } = require(
 const menuRouter = new KoaRouter({ prefix: "/menu" });
 
 menuRouter.post("/create", authVerify, permVerify, verifyCreate, createMenu);
-menuRouter.delete("/delete/:id", authVerify, verifyDelete, deleteMenu);
+menuRouter.delete("/delete/:id", authVerify, permVerify, verifyDelete, deleteMenu);
 menuRouter.post("/update", authVerify, permVerify, verifyUpdate, updateMenu);
 menuRouter.get("/get-user-menu", authVerify, getUserMenu);
 menuRouter.get("/get-menu-list", authVerify, verifyMenuAll, getMenuAll);

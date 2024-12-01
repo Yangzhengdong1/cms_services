@@ -8,7 +8,7 @@ const {
   INTERNAL_PROBLEMS,
   NO_PERMISSION
 } = require("../constant/error-types");
-const { comparePerm } = require("../constant/permission");
+const { comparePerm, urlToPermMap } = require("../constant/permission");
 
 const { queryRolePermission } = require("../services/auth.service");
 
@@ -23,7 +23,7 @@ const authVerify = async (ctx, next) => {
 
   // 获取当前操作权限名称
   const { url } = ctx.request;
-  const permName = url.split("/").splice(1, 2).join("_");
+  const permName = urlToPermMap[url.split("/").splice(0, 3).join("/")];
 
 	const { authorization } = ctx.headers;
 	if (!authorization) {
