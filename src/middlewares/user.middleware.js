@@ -8,13 +8,17 @@ const {
 	createError,
 	ACCOUNT_ALREADY_EXISTS,
 	INTERNAL_PROBLEMS,
-	NO_PERMISSION
+	NO_PERMISSION,
+	INVALID_PARAMETER
 } = require("../constant/error-types");
+const { comparePerm } = require("../constant/permission");
+
 const { hashEncryption } = require("../utils/bcrypt");
 
 const { queryUserExist } = require("../services/user.service");
 const { queryRole } = require("../services/role.service");
 const { queryDepartment } = require("../services/dept.service");
+const { queryRolePermission } = require("../services/auth.service");
 
 /**
  * @description: 处理用户创建参数（不允许重名/必填参数：name、password、phone）
@@ -114,12 +118,14 @@ const verifyCreate = async (ctx, next) => {
 const verifyInfo = async (ctx, next) => {
 	console.log("用户校验 Middleware: verifyInfo~");
 
+	// 查询时首先看是否是查自己的信息，如果是直接查，否则看当前用户的角色是否有查询的权限
 	const { id } = ctx.params;
 	const { wid } = ctx.auth.userInfo;
 
-	// todo:这里之后需要查询权限，看当前角色是否有查询用户信息(query_user_info)的权限
+	const { roleId, permName } = ctx.auth.userInfo;
+	const result = await queryRolePermission(roleId);
 
-	if (id !== wid) {
+	if (id !== wid && !comparePerm(result, permName)) {
 		createError(NO_PERMISSION, ctx);
 		return;
 	}
@@ -127,7 +133,39 @@ const verifyInfo = async (ctx, next) => {
 	await next();
 };
 
+const verifyUserAll = async (ctx, next) => {
+	console.log("用户校验 Middleware: verifyUserAll~");
+
+	// 可选参数
+	let { id, username, roleName, departmentName, phone, startTime, endTime } =
+		ctx.query;
+	const optionalParams = {
+		id,
+		username,
+		roleName,
+		departmentName,
+		phone,
+		startTime,
+		endTime
+	};
+	for (const key in optionalParams) {
+		if (Object.prototype.hasOwnProperty.call(optionalParams, key)) {
+			let element = optionalParams[key];
+			optionalParams[key] = element ? element : null;
+		}
+	}
+
+	const { limitParams } = ctx.public;
+
+	let params = { ...optionalParams, ...limitParams };
+
+	ctx.user = { getListParams: params };
+
+	await next();
+};
+
 module.exports = {
 	verifyCreate,
-	verifyInfo
+	verifyInfo,
+	verifyUserAll
 };

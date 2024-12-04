@@ -1,7 +1,7 @@
 const KoaRouter = require("koa-router");
 
 const { authVerify } = require("../middlewares/auth.middleware");
-const { upload, verifyUpload } = require("../middlewares/upload.middleware");
+const { verifyUpload } = require("../middlewares/upload.middleware");
 const { uploadImg } = require("../controllers/upload.controller");
 
 

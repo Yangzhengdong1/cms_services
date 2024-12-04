@@ -1,7 +1,8 @@
 const {
 	createError,
 	USER_NOT_FOUND,
-	INTERNAL_PROBLEMS
+	INTERNAL_PROBLEMS,
+	INVALID_PARAMETER
 } = require("../constant/error-types");
 const {
 	LOGIN_ARGUMENT_IS_NOT_EMPTY,
@@ -135,9 +136,30 @@ const menuDeptVerify = async (ctx, next) => {
 	await next();
 };
 
+const limitVerify = async (ctx, next) => {
+	console.log("分页校验 Middleware: limitVerify~");
+
+	let { pageSize: offset, pageNum: limit } = ctx.query;
+	let params = {};
+
+	if (offset && limit) {
+		if (isNaN(offset * 1) || isNaN(limit * 1)) {
+			createError(INVALID_PARAMETER, ctx);
+			return;
+		}
+		offset = offset - 1 > 0 ? offset : "0";
+		limit = limit > 0 ? limit : "10";
+		params = { limit, offset };
+	}
+	ctx.public = { limitParams: params };
+
+	await next();
+};
+
 module.exports = {
 	loginVerify,
 	dictVerify,
 	rolePermVerify,
-	menuDeptVerify
+	menuDeptVerify,
+  limitVerify
 };

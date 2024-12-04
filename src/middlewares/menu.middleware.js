@@ -4,7 +4,6 @@ const {
 	MENU_UPDATE_PARENT_ID_NOT_FOUND,
 	MENU_UPDATE_ID_REPETITIVE
 } = require("@/constant/messages");
-const { createError, INVALID_PARAMETER } = require("../constant/error-types");
 
 const { verifyIdExist } = require("../controllers/menu.controller");
 
@@ -127,18 +126,7 @@ const verifyDelete = async (ctx, next) => {
 const verifyMenuAll = async (ctx, next) => {
   console.log("菜单校验 Middleware: verifyMenuAll~");
 
-	let { pageSize: offset, pageNum: limit } = ctx.query;
-	let params = {};
-
-	if (offset && limit) {
-		if (isNaN(offset * 1) || isNaN(limit * 1)) {
-			createError(INVALID_PARAMETER, ctx);
-			return;
-		}
-		offset = offset > 0 ? offset : 1;
-		limit = limit > 0 ? limit : 10;
-		params = { limit, offset };
-	}
+  const { limitParams: params } = ctx.public;
 
 	ctx.menu = { getListParams: params };
 

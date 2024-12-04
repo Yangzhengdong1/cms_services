@@ -1,6 +1,6 @@
 const { createError, INTERNAL_PROBLEMS } = require("../constant/error-types");
 
-const { create, queryUserExist } = require("../services/user.service");
+const { create, queryUserExist, getUserList } = require("../services/user.service");
 
 class UserController {
 	async createUser(ctx) {
@@ -23,21 +23,49 @@ class UserController {
 			return;
 		}
 
-    const { wid, username, phone, roleId, departmentId, createTime, updateTime, roleName, departmentName } = result[0];
+		const {
+			wid,
+			username,
+			phone,
+			roleId,
+			departmentId,
+			createTime,
+			updateTime,
+			roleName,
+			departmentName,
+			avatarUrl
+		} = result[0];
 
 		ctx.body = {
 			code: 0,
 			data: {
 				username,
-        roleName,
-        departmentName,
+				roleName,
+				departmentName,
 				wid,
 				roleId,
 				departmentId,
 				phone,
+				avatarUrl,
 				createTime,
 				updateTime
 			},
+			message: "查询成功~"
+		};
+	}
+
+	async getUserAll(ctx) {
+		const { getListParams } = ctx.user;
+		const result = await getUserList(getListParams);
+		if (!result) {
+			createError(INTERNAL_PROBLEMS, ctx);
+			return;
+		}
+
+		ctx.body = {
+			code: 0,
+			total: result.length,
+			data: result,
 			message: "查询成功~"
 		};
 	}

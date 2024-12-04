@@ -1,7 +1,11 @@
 const { createError, INTERNAL_PROBLEMS } = require("../constant/error-types");
 const { createToken } = require("../utils/jwt");
 
-const { queryDictTable, rolePerm, menuDept } = require("../services/public.service");
+const {
+	queryDictTable,
+	rolePerm,
+	menuDept
+} = require("../services/public.service");
 
 class PublicController {
 	login(ctx) {
@@ -16,8 +20,7 @@ class PublicController {
 			departmentName
 		} = ctx.dbUserInfo;
 
-		// 颁发 token
-		const token = createToken({
+		const payload = {
 			wid,
 			username,
 			departmentId,
@@ -25,7 +28,13 @@ class PublicController {
 			isActive,
 			roleName,
 			departmentName
-		});
+		};
+		const options = {
+			expiresIn: 60 * 60 * 24 * 30,
+			algorithm: "RS256"
+		};
+		// 颁发 token
+		const token = createToken(payload, options);
 		if (!token) {
 			createError(INTERNAL_PROBLEMS, ctx);
 			return;
@@ -33,7 +42,7 @@ class PublicController {
 		ctx.body = {
 			code: 0,
 			data: {
-        id: wid,
+				id: wid,
 				username,
 				phone,
 				token
@@ -79,21 +88,21 @@ class PublicController {
 		};
 	}
 
-  async menuDeptRelevance(ctx) {
-    const { menuDeptParams } = ctx.public;
+	async menuDeptRelevance(ctx) {
+		const { menuDeptParams } = ctx.public;
 
-    const result = await menuDept(menuDeptParams);
+		const result = await menuDept(menuDeptParams);
 
-    if (!result) {
-      createError(INTERNAL_PROBLEMS, ctx);
-      return;
-    }
+		if (!result) {
+			createError(INTERNAL_PROBLEMS, ctx);
+			return;
+		}
 
-    ctx.body = {
-      code: 0,
-      message: "部门菜单关联成功~"
-    };
-  }
+		ctx.body = {
+			code: 0,
+			message: "部门菜单关联成功~"
+		};
+	}
 }
 
 module.exports = new PublicController();
