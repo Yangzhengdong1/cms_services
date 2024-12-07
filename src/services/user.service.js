@@ -1,5 +1,6 @@
 const connection = require("../app/database");
 const { buildWhereClause } = require("@/utils/format");
+const { queryTableTotal } = require("./public.service");
 
 
 class UserService {
@@ -44,7 +45,7 @@ class UserService {
 	async queryUserExist(fieldKey, fieldValue) {
 		let statement = `
       SELECT 
-        wid, name AS username, phone + 0 AS phone, department_id AS departmentId, role_id AS roleId, role_name AS roleName, department_name AS departmentName,
+        wid, name AS username, password, phone + 0 AS phone, department_id AS departmentId, role_id AS roleId, role_name AS roleName, department_name AS departmentName,
         is_active AS isActive,
         avatar_url AS avatarUrl,
         DATE_FORMAT(createAt, '%Y-%m-%d %H:%i:%s') AS createTime,
@@ -63,10 +64,12 @@ class UserService {
 	async getUserList(params) {
 		const fieldSqlMap = {
 			id: "wid = ?",
+      roleId: "role_id = ?",
+      departmentId: "department_id = ?",
 			username: "name LIKE ?",
 			roleName: "role_name LIKE ?",
 			departmentName: "department_name LIKE ?",
-			phone: "phone = ?"
+			phone: "phone LIKE ?"
 		};
 
 		const { where, values, limitStatement } = buildWhereClause(params, fieldSqlMap);
@@ -92,11 +95,12 @@ class UserService {
     `;
 
 		try {
+      const [ totalResult ] = await queryTableTotal("users");
 			const [result] = await connection.execute(statement, values);
-			return result;
+			return { total: totalResult.total, result };
 		} catch (error) {
 			console.log(error, "查询用户列表失败-db");
-			return false;
+			return { status: "fail" };
 		}
 	}
 }

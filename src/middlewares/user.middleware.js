@@ -8,8 +8,7 @@ const {
 	createError,
 	ACCOUNT_ALREADY_EXISTS,
 	INTERNAL_PROBLEMS,
-	NO_PERMISSION,
-	INVALID_PARAMETER
+	NO_PERMISSION
 } = require("../constant/error-types");
 const { comparePerm } = require("../constant/permission");
 
@@ -137,13 +136,15 @@ const verifyUserAll = async (ctx, next) => {
 	console.log("用户校验 Middleware: verifyUserAll~");
 
 	// 可选参数
-	let { id, username, roleName, departmentName, phone, startTime, endTime } =
-		ctx.query;
+	let { id, username, roleName, roleId, departmentName, departmentId, phone, startTime, endTime } =
+		ctx.request.body;
 	const optionalParams = {
 		id,
 		username,
 		roleName,
+    roleId,
 		departmentName,
+    departmentId,
 		phone,
 		startTime,
 		endTime

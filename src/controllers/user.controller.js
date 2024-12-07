@@ -56,16 +56,17 @@ class UserController {
 
 	async getUserAll(ctx) {
 		const { getListParams } = ctx.user;
-		const result = await getUserList(getListParams);
-		if (!result) {
+		const { total, result, status } = await getUserList(getListParams);
+		if (status) {
 			createError(INTERNAL_PROBLEMS, ctx);
 			return;
 		}
 
 		ctx.body = {
 			code: 0,
-			total: result.length,
-			data: result,
+      totalCount: total,
+			pageNum: result.length,
+			list: result,
 			message: "查询成功~"
 		};
 	}

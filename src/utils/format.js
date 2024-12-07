@@ -23,15 +23,21 @@ const arrayToTree = data => {
 	return tree;
 };
 
-// 动态构建查询条件
-const buildWhereClause = (params, fieldMap) => {
+/**
+ * @description: 动态构建查询条件
+ * @param {*} params 参数
+ * @param {*} fieldSqlMap 字段sql映射
+ * @param {*} likeField 模糊查询字段
+ * @return {*} {where, values, limitStatement} 查询条件/值/分页语句
+ */
+const buildWhereClause = (params, fieldSqlMap) => {
 	let where = [];
 	let values = [];
 	let limitStatement = ";";
-  // 特殊字段
+	// 特殊字段
 	const specialField = ["limit", "offset", "startTime", "endTime"];
 	// 模糊查询字段
-  const likeField = ["username", "departmentName", "roleName"];
+	const likeField = ["username", "departmentName", "roleName", "phone"];
 
 	const { limit, offset, startTime, endTime } = params;
 	if (startTime && endTime) {
@@ -39,6 +45,7 @@ const buildWhereClause = (params, fieldMap) => {
 		values.push(startTime, endTime);
 	}
 
+  // 判断 params 中的属性是否有值
 	Object.keys(params).forEach(key => {
 		let value = params[key];
 
@@ -47,7 +54,8 @@ const buildWhereClause = (params, fieldMap) => {
 		}
 
 		if (typeof value !== "undefined" && value !== null) {
-			where.push(fieldMap[key]);
+      // 如果有值将对应的 sql 语句添加进去
+			where.push(fieldSqlMap[key]);
 
 			if (likeField.includes(key)) {
 				value = `%${value}%`;

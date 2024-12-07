@@ -13,7 +13,7 @@ const handleBatchStatement = (doubleArray, statement) => {
 
 class PublicService {
 	async queryDictTable(name) {
-		const statement = ` SELECT wid, name FROM ${name}; `;
+		const statement = ` SELECT wid, name FROM ${name} ORDER BY createAt DESC;`;
 		try {
 			const [result] = await connection.execute(statement, []);
 			return result;
@@ -70,6 +70,16 @@ class PublicService {
 			return false;
 		}
 	}
+
+  async queryTableTotal(tableName) {
+    const statement = `SELECT COUNT(*) AS total FROM ${tableName};`;
+    try {
+      const [ result ] = await connection.execute(statement, []);
+      return result;
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
 }
 
 module.exports = new PublicService();

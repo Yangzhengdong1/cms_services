@@ -139,16 +139,16 @@ const menuDeptVerify = async (ctx, next) => {
 const limitVerify = async (ctx, next) => {
 	console.log("分页校验 Middleware: limitVerify~");
 
-	let { pageSize: offset, pageNum: limit } = ctx.query;
 	let params = {};
+	let { pageSize: offset, pageNum: limit } = ctx.method === "GET" ? ctx.query : ctx.request.body;
 
 	if (offset && limit) {
 		if (isNaN(offset * 1) || isNaN(limit * 1)) {
 			createError(INVALID_PARAMETER, ctx);
 			return;
 		}
-		offset = offset - 1 > 0 ? offset : "0";
-		limit = limit > 0 ? limit : "10";
+		offset = offset - 1 > 0 ? offset + "" : "0";
+		limit = limit > 0 ? limit + "" : "10";
 		params = { limit, offset };
 	}
 	ctx.public = { limitParams: params };

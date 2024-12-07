@@ -10,6 +10,6 @@ const userRouter = new KoaRouter({prefix: "/user"});
 userRouter.post("/create",authVerify, permVerify, verifyCreate, createUser);
 userRouter.delete("/delete/:id", authVerify);
 userRouter.get("/info/:id", authVerify, verifyInfo, getUserInfo);
-userRouter.get("/get-list", authVerify, limitVerify, verifyUserAll, getUserAll);
+userRouter.post("/get-list", authVerify, limitVerify, verifyUserAll, getUserAll);
 
 module.exports = userRouter;
