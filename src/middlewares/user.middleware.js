@@ -27,11 +27,11 @@ const { queryRolePermission } = require("../services/auth.service");
 const verifyCreate = async (ctx, next) => {
 	console.log("用户校验 Middleware: verifyCreate~");
 
-	const { name, password, phone, departmentId, roleId, isActive } =
+	const { name, realname, password, phone, departmentId, roleId, isActive } =
 		ctx.request.body;
 
 	// 判断必传参数
-	const requiredFields = [name, password, phone];
+	const requiredFields = [name, realname, password, phone];
 	const flag = requiredFields.every(item => !!item === true);
 	if (!flag) {
 		ctx.app.emit("message", CREATE_USER_ARGUMENT_IS_NOT_EMPTY, ctx);
@@ -95,11 +95,12 @@ const verifyCreate = async (ctx, next) => {
 
 	const params = {
 		username: name,
+    realname,
 		password: hashEncryption(password),
 		phone,
 		departmentId: departmentId ? departmentId : null,
 		roleId: roleId ? roleId : null,
-		isActive: isActive ? isActive : 1,
+		isActive: isActive ? 1 : 0,
 		roleName,
 		departmentName
 	};

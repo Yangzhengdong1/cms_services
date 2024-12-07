@@ -62,6 +62,8 @@ class UserController {
 			return;
 		}
 
+    result.forEach(item => (item.isActive = !!item.isActive));
+
 		ctx.body = {
 			code: 0,
       totalCount: total,

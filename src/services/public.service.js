@@ -64,7 +64,7 @@ class PublicService {
 
 		try {
 			const [result] = await connection.execute(statement, values);
-			return result;
+      return result;
 		} catch (error) {
 			console.log(error, "关联部门菜单出错-db");
 			return false;

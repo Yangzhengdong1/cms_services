@@ -7,6 +7,7 @@ class UserService {
 	async create(params) {
 		const {
 			username,
+      realname,
 			password,
 			phone,
 			departmentId,
@@ -17,11 +18,12 @@ class UserService {
 		} = params;
 		const statement = `
       INSERT INTO users
-        (name, password, phone, department_id, role_id, is_active, role_name, department_name)
-      VALUES(?, ?, ?, ?, ?, ?, ?, ?);`;
+        (name, real_name, password, phone, department_id, role_id, is_active, role_name, department_name)
+      VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?);`;
 		try {
 			const [result] = await connection.execute(statement, [
 				username,
+        realname,
 				password,
 				phone,
 				departmentId,
@@ -76,8 +78,9 @@ class UserService {
 		let statement = `
       SELECT
         wid,
-        NAME AS username,
-        phone + 0 AS phone,
+        name AS username,
+        real_name AS realname,
+        phone AS phone,
         department_id AS departmentId,
         role_id AS roleId,
         role_name AS roleName,
