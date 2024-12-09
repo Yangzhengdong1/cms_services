@@ -140,7 +140,9 @@ const limitVerify = async (ctx, next) => {
 	console.log("分页校验 Middleware: limitVerify~");
 
 	let params = {};
-	let { pageSize: offset, pageNum: limit } = ctx.method === "GET" ? ctx.query : ctx.request.body;
+
+  // pageSize 对应 limit，pageNum 对应 offset
+	let { pageSize: limit, pageNum: offset } = ctx.method === "GET" ? ctx.query : ctx.request.body;
 
 	if (offset && limit) {
 		if (isNaN(offset * 1) || isNaN(limit * 1)) {

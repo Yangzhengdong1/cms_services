@@ -57,7 +57,9 @@ class PublicController {
 	 */
 	async getDictTable(ctx) {
 		const { name } = ctx.public.dictParams;
-		const result = await queryDictTable(name);
+		const fields = name === "levels" ? ["label", "value"] : ["name", "wid"];
+
+		const result = await queryDictTable(name, fields);
 
 		if (!result) {
 			createError(INTERNAL_PROBLEMS, ctx);

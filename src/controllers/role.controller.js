@@ -14,7 +14,7 @@ class RoleController {
 		}
 
 		if (permissions.length > 0) {
-      console.log("角色关联权限-create");
+      console.log("角色权限关联-create");
       // 查询角色信息
       const role = await queryRole("name", name);
       if (!role) {

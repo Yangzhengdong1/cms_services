@@ -1,5 +1,5 @@
 const { createError, INTERNAL_PROBLEMS } = require("../constant/error-types");
-const { create, queryDepartment } = require("../services/dept.service");
+const { create, queryDepartment, remove, getDepartmentList } = require("../services/dept.service");
 const { menuDept } = require("../services/public.service");
 
 class DepartmentService {
@@ -14,7 +14,7 @@ class DepartmentService {
 		}
 
 		if (menus.length > 0) {
-      console.log("部门菜单关联-create");
+			console.log("部门菜单关联-create");
 			// 查询刚创建的部门信息
 			const department = await queryDepartment("name", name);
 			if (!department) {
@@ -39,6 +39,39 @@ class DepartmentService {
 		ctx.body = {
 			code: 0,
 			message: "创建部门成功~"
+		};
+	}
+
+	async deleteDepartment(ctx) {
+		const { id } = ctx.params;
+		const result = await remove(id);
+
+		if (!result) {
+			createError(INTERNAL_PROBLEMS, ctx);
+			return;
+		}
+
+		ctx.body = {
+			code: 0,
+			message: "删除部门成功~"
+		};
+	}
+
+	async getDeptAll(ctx) {
+		const { getListParams } = ctx.department;
+		const { result, total, status } = await getDepartmentList(getListParams);
+
+		if (status) {
+			createError(INTERNAL_PROBLEMS, ctx);
+			return;
+		}
+
+		ctx.body = {
+			code: 0,
+      totalCount: total,
+      pageSize: result.length,
+			list: result,
+			message: "查询成功~"
 		};
 	}
 }

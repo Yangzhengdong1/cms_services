@@ -45,7 +45,7 @@ const buildWhereClause = (params, fieldSqlMap) => {
 		values.push(startTime, endTime);
 	}
 
-  // 判断 params 中的属性是否有值
+	// 判断 params 中的属性是否有值
 	Object.keys(params).forEach(key => {
 		let value = params[key];
 
@@ -54,7 +54,7 @@ const buildWhereClause = (params, fieldSqlMap) => {
 		}
 
 		if (typeof value !== "undefined" && value !== null) {
-      // 如果有值将对应的 sql 语句添加进去
+			// 如果有值将对应的 sql 语句添加进去
 			where.push(fieldSqlMap[key]);
 
 			if (likeField.includes(key)) {
@@ -77,7 +77,20 @@ const buildWhereClause = (params, fieldSqlMap) => {
 	};
 };
 
+const filterOptionalParams = params => {
+	let optionalParams = { ...params };
+	for (const key in optionalParams) {
+		if (Object.prototype.hasOwnProperty.call(optionalParams, key)) {
+			let element = optionalParams[key];
+			optionalParams[key] = element ? element : null;
+		}
+	}
+
+	return optionalParams;
+};
+
 module.exports = {
 	arrayToTree,
-	buildWhereClause
+	buildWhereClause,
+  filterOptionalParams
 };

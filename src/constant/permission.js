@@ -42,6 +42,7 @@ const urlToPermMap = {
 	"/department/delete": DEPT_DELETE,
 	"/department/update": DEPT_UPDATE,
 	"/department/query": DEPT_QUERY,
+	"/department/get-list": DEPT_QUERY,
 
 	"/permission/create": PERM_CREATE,
 	"/permission/delete": PERM_DELETE,

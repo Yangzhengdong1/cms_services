@@ -26,6 +26,7 @@ class UserController {
 		const {
 			wid,
 			username,
+      realname,
 			phone,
 			roleId,
 			departmentId,
@@ -40,6 +41,7 @@ class UserController {
 			code: 0,
 			data: {
 				username,
+        realname,
 				roleName,
 				departmentName,
 				wid,
@@ -67,7 +69,7 @@ class UserController {
 		ctx.body = {
 			code: 0,
       totalCount: total,
-			pageNum: result.length,
+			pageSize: result.length,
 			list: result,
 			message: "查询成功~"
 		};
