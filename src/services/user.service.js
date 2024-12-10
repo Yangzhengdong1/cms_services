@@ -84,6 +84,7 @@ class UserService {
         department_id AS departmentId,
         role_id AS roleId,
         role_name AS roleName,
+        (SELECT level FROM roles WHERE wid = users.role_id) AS level,
         department_name AS departmentName,
         is_active AS isActive,
         avatar_url AS avatarUrl,
@@ -98,7 +99,7 @@ class UserService {
     `;
 
 		try {
-      const [ totalResult ] = await queryTableTotal("users");
+      const [ totalResult ] = await queryTableTotal("users", where, values);
 			const [result] = await connection.execute(statement, values);
 			return { total: totalResult.total, result };
 		} catch (error) {

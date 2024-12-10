@@ -72,10 +72,11 @@ class PublicService {
 		}
 	}
 
-  async queryTableTotal(tableName) {
-    const statement = `SELECT COUNT(*) AS total FROM ${tableName};`;
+  async queryTableTotal(tableName, where = "", values = []) {
+    values = values.slice(0, -2);
+    const statement = `SELECT COUNT(*) AS total FROM ${tableName} ${where};`;
     try {
-      const [ result ] = await connection.execute(statement, []);
+      const [ result ] = await connection.execute(statement, values);
       return result;
     } catch (error) {
       throw new Error(error);

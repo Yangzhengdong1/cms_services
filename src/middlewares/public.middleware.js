@@ -149,7 +149,9 @@ const limitVerify = async (ctx, next) => {
 			createError(INVALID_PARAMETER, ctx);
 			return;
 		}
-		offset = offset - 1 > 0 ? offset + "" : "0";
+
+    // offset 实际偏移量为 (pageNum * pageSize)
+		offset = offset - 1 > 0 ? (offset * limit) + "" : "0";
 		limit = limit > 0 ? limit + "" : "10";
 		params = { limit, offset };
 	}

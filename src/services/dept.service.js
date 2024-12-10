@@ -65,7 +65,7 @@ class DepartmentService {
         ${limitStatement}`;
 
 		try {
-			const [totalResult] = await queryTableTotal("departments");
+			const [totalResult] = await queryTableTotal("departments", where, values);
 			const [result] = await connection.execute(statement, values);
 			return { result, total: totalResult.total };
 		} catch (error) {
