@@ -23,6 +23,7 @@ const permRouter = require("@/routers/permission.router");
 const deptRouter = require("@/routers/department.router");
 const roleRouter = require("@/routers/role.router");
 const uploadRouter = require("@/routers/upload.router");
+const goodsRouter = require("@/routers/goods.router");
 
 const app = new Koa();
 
@@ -51,6 +52,8 @@ app.use(roleRouter.routes());
 app.use(roleRouter.allowedMethods());
 app.use(uploadRouter.routes());
 app.use(uploadRouter.allowedMethods());
+app.use(goodsRouter.routes());
+app.use(goodsRouter.allowedMethods());
 
 app.on("error", handleError);
 app.on("message", handleMessage);

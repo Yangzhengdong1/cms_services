@@ -30,14 +30,14 @@ const arrayToTree = data => {
  * @param {*} likeField 模糊查询字段
  * @return {*} {where, values, limitStatement} 查询条件/值/分页语句
  */
-const buildWhereClause = (params, fieldSqlMap) => {
+const likeFields = ["username", "departmentName", "roleName", "phone"];
+const buildWhereClause = (params, fieldSqlMap, likeField = likeFields) => {
 	let where = [];
 	let values = [];
 	let limitStatement = ";";
 	// 特殊字段
 	const specialField = ["limit", "offset", "startTime", "endTime"];
 	// 模糊查询字段
-	const likeField = ["username", "departmentName", "roleName", "phone"];
 
 	const { limit, offset, startTime, endTime } = params;
 	if (startTime && endTime) {
