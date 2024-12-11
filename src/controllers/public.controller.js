@@ -6,6 +6,7 @@ const {
 	rolePerm,
 	menuDept
 } = require("../services/public.service");
+const { arrayToTree } = require("../utils/format");
 
 class PublicController {
 	login(ctx) {
@@ -57,14 +58,23 @@ class PublicController {
 	 */
 	async getDictTable(ctx) {
 		const { name } = ctx.public.dictParams;
-		const fields = name === "levels" ? ["label", "value"] : ["name", "wid"];
+    const { name: queryName } = ctx.params;
+		let fields = name === "levels" ? ["label", "value"] : ["name", "wid"];
 
-		const result = await queryDictTable(name, fields);
+    if (queryName === "MENU_TREE" || queryName === "DEPT_TREE") {
+      fields = ["name", "wid", "parent_id AS parentId"];
+    }
+
+		let result = await queryDictTable(name, fields);
 
 		if (!result) {
 			createError(INTERNAL_PROBLEMS, ctx);
 			return;
 		}
+
+    if (queryName === "MENU_TREE" || queryName === "DEPT_TREE") {
+      result = arrayToTree(result);
+    }
 
 		ctx.body = {
 			code: 0,
