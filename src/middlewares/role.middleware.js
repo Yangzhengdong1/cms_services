@@ -3,11 +3,12 @@ const {
 	ROLE_CREATE_NAME_IS_EXIST,
 	DEPT_NOT_FOUND,
 	ROLE_CREATE_ARGUMENT_IS_NOT_EMPTY,
-  ROLE_CREATE_ARGUMENT_TYPE_ERROR
+	ROLE_CREATE_ARGUMENT_TYPE_ERROR
 } = require("../constant/messages");
 
 const { queryDepartment } = require("../services/dept.service");
 const { queryRole } = require("../services/role.service");
+const { filterOptionalParams } = require("../utils/format");
 
 const verifyCreate = async (ctx, next) => {
 	console.log("角色校验 Middleware: verifyCreate~");
@@ -56,6 +57,23 @@ const verifyCreate = async (ctx, next) => {
 	await next();
 };
 
+const verifyRoleAll = async (ctx, next) => {
+	const { limitParams } = ctx.public;
+	const { roleName, description, departmentId, level } = ctx.request.body;
+	const optionalParams = filterOptionalParams({
+		roleName,
+		description,
+		departmentId,
+		level
+	});
+
+	const params = { ...optionalParams, ...limitParams };
+	ctx.role = { getListParams: params };
+
+	await next();
+};
+
 module.exports = {
-	verifyCreate
+	verifyCreate,
+	verifyRoleAll
 };

@@ -7,7 +7,7 @@ class AuthClass {
       FROM permissions AS p 
       JOIN role_permissions rp 
       ON p.wid = rp.permission_id 
-      WHERE rp.role_id = ?;
+      WHERE rp.role_id = ?  ORDER BY p.name ASC;
     `;
     try {
       const [result] = await connection.execute(statement, [roleId]);

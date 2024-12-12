@@ -30,7 +30,7 @@ const arrayToTree = data => {
  * @param {*} likeField 模糊查询字段
  * @return {*} {where, values, limitStatement} 查询条件/值/分页语句
  */
-const likeFields = ["username", "departmentName", "roleName", "phone"];
+const likeFields = ["username", "departmentName", "roleName", "phone", "description"];
 const buildWhereClause = (params, fieldSqlMap, likeField = likeFields) => {
 	let where = [];
 	let values = [];

@@ -1,6 +1,7 @@
 const { createError, INTERNAL_PROBLEMS } = require("../constant/error-types");
+const { queryRolePermission } = require("../services/auth.service");
 const { rolePerm } = require("../services/public.service");
-const { create, queryRole } = require("../services/role.service");
+const { create, queryRole, getRoleList } = require("../services/role.service");
 
 class RoleController {
 	async createRole(ctx) {
@@ -14,31 +15,68 @@ class RoleController {
 		}
 
 		if (permissions.length > 0) {
-      console.log("角色权限关联-create");
-      // 查询角色信息
-      const role = await queryRole("name", name);
-      if (!role) {
-        createError(INTERNAL_PROBLEMS, ctx);
-        return;
-      }
-      const { wid: roleId, name: roleName } = role[0];
-      // 关联权限
-      const params = {
-        roleId,
-        roleName,
-        permissions
-      };
+			console.log("角色权限关联-create");
+			// 查询角色信息
+			const role = await queryRole("name", name);
+			if (!role) {
+				createError(INTERNAL_PROBLEMS, ctx);
+				return;
+			}
+			const { wid: roleId, name: roleName } = role[0];
+			// 关联权限
+			const params = {
+				roleId,
+				roleName,
+				permissions
+			};
 
-      const res = await rolePerm(params);
-      if (!res) {
-        createError(INTERNAL_PROBLEMS, ctx);
-        return;
-      }
+			const res = await rolePerm(params);
+			if (!res) {
+				createError(INTERNAL_PROBLEMS, ctx);
+				return;
+			}
 		}
 
 		ctx.body = {
 			code: 0,
 			message: "角色创建成功~"
+		};
+	}
+
+	async getPermossionList(ctx) {
+		const { roleId } = ctx.auth.userInfo;
+
+		let result = await queryRolePermission(roleId);
+
+		if (!result) {
+			createError(INTERNAL_PROBLEMS, ctx);
+			return;
+		}
+
+		result = result.map(item => item.name);
+
+		ctx.body = {
+			code: 0,
+			permissions: result,
+			message: "查询成功~"
+		};
+	}
+
+	async getRoleAll(ctx) {
+		const { getListParams } = ctx.role;
+
+		const { result, total, status } = await getRoleList(getListParams);
+
+		if (status) {
+			createError(INTERNAL_PROBLEMS, ctx);
+			return;
+		}
+		ctx.body = {
+			code: 0,
+			totalCount: total,
+			pageSize: result.length,
+			list: result,
+			message: "查询成功~"
 		};
 	}
 }
