@@ -1,7 +1,7 @@
 const { createError, INTERNAL_PROBLEMS } = require("../constant/error-types");
 const { queryRolePermission } = require("../services/auth.service");
 const { rolePerm } = require("../services/public.service");
-const { create, queryRole, getRoleList } = require("../services/role.service");
+const { create, queryRole, getRoleList, getRoleInfo } = require("../services/role.service");
 
 class RoleController {
 	async createRole(ctx) {
@@ -76,6 +76,25 @@ class RoleController {
 			totalCount: total,
 			pageSize: result.length,
 			list: result,
+			message: "查询成功~"
+		};
+	}
+
+	async getRoleDetail(ctx) {
+    const { id } = ctx.params;
+		let [result] = await getRoleInfo(id);
+
+		if (!result) {
+			createError(INTERNAL_PROBLEMS, ctx);
+			return;
+		}
+
+    result.permissions = result.permissions.filter(item => item !== null);
+
+
+		ctx.body = {
+			code: 0,
+			data: result,
 			message: "查询成功~"
 		};
 	}

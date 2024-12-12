@@ -52,13 +52,53 @@ class RoleService {
     `;
 
 		try {
-			const totalResult = await queryTableTotal("roles", where, values);
+			const [totalResult] = await queryTableTotal("roles", where, values);
 			const [result] = await connection.execute(statement, values);
-      return { result, total: totalResult.total };
+			return { result, total: totalResult.total };
 		} catch (error) {
 			console.log(error, "查询角色列表出错-db");
 			return { status: "fail" };
 		}
+	}
+
+	async getRoleInfo(id) {
+		const statement = `
+      SELECT
+        roles.wid,
+        roles.name,
+        roles.description,
+        -- 查询权限列表，返回 JSON 数组。如果没有权限，返回空数组
+        JSON_ARRAYAGG(
+        IF
+          ( pm.wid IS NOT NULL, -- 如果权限 ID 不为空
+            JSON_OBJECT( "id", pm.wid, "name", pm.name, "description", pm.description ), NULL -- 否则返回 NULL（在过滤中会被排除）
+          ) 
+        ) AS permissions,
+        JSON_OBJECT( "id", roles.department_id, "name", d.name ) AS department,
+        roles.level 
+      FROM
+        roles
+        LEFT JOIN role_permissions rm ON rm.role_id = roles.wid
+        LEFT JOIN permissions pm ON rm.permission_id = pm.wid
+        LEFT JOIN departments d ON d.wid = roles.department_id 
+      WHERE
+        roles.wid = ?
+      GROUP BY
+        roles.wid,
+        roles.name,
+        roles.description,
+        roles.department_id,
+        d.name,
+        roles.level;
+    `;
+
+    try {
+      const [ result ] = await connection.execute(statement, [ id ]);
+      return result;
+    } catch (error) {
+      console.log(error, "查询角色详情出错-db");
+      return false;
+    }
 	}
 
 	async queryRole(fieldKey, fieldValue) {
