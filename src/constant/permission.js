@@ -30,6 +30,7 @@ const urlToPermMap = {
 	"/menu/update": MENU_UPDATE,
 	"/menu/create": MENU_CREATE,
 	"/menu/delete": MENU_DELETE,
+	"/menu/query": MENU_QUERY,
 	"/menu/get-user-menu": MENU_QUERY,
 	"/menu/get-menu-list": MENU_QUERY,
 
@@ -37,6 +38,8 @@ const urlToPermMap = {
 	"/user/delete": USER_DELETE,
 	"/user/update": USER_UPDATE,
 	"/user/query": USER_QUERY,
+	"/user/info": USER_QUERY,
+	"/user/get-list": USER_QUERY,
 
 	"/department/create": DEPT_CREATE,
 	"/department/delete": DEPT_DELETE,
@@ -53,6 +56,9 @@ const urlToPermMap = {
 	"/role/delete": ROLE_DELETE,
 	"/role/update": ROLE_UPDATE,
 	"/role/query": ROLE_QUERY,
+	"/role/detail": ROLE_QUERY,
+	"/role/get-permission-list": ROLE_QUERY,
+	"/role/get-list": ROLE_QUERY,
 
 	"/upload/img": UPLOAD_IMG,
 	"/upload/file": UPLOAD_FILE

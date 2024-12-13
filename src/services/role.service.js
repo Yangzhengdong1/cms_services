@@ -21,6 +21,18 @@ class RoleService {
 		}
 	}
 
+	async remove(id) {
+		const statement = "DELETE FROM roles WHERE wid = ?";
+
+		try {
+			const [result] = await connection.execute(statement, [id]);
+			return result;
+		} catch (error) {
+			console.log(error, "删除角色出错-db");
+			return false;
+		}
+	}
+
 	async getRoleList(params) {
 		const fieldSqlMap = {
 			roleName: "name LIKE ?",
@@ -41,7 +53,9 @@ class RoleService {
         description,
         department_id AS departmentId,
         ( SELECT name FROM departments WHERE wid = roles.department_id ) AS departmentName,
-      level 
+        level,
+        DATE_FORMAT(createAt, '%Y-%m-%d %H:%i:%s') AS createTime,
+        DATE_FORMAT(updateAt, '%Y-%m-%d %H:%i:%s') AS updateTime
       FROM
         roles
         ${where} 
@@ -75,7 +89,9 @@ class RoleService {
           ) 
         ) AS permissions,
         JSON_OBJECT( "id", roles.department_id, "name", d.name ) AS department,
-        roles.level 
+        roles.level,
+        DATE_FORMAT(roles.createAt, '%Y-%m-%d %H:%i:%s') AS createTime,
+        DATE_FORMAT(roles.updateAt, '%Y-%m-%d %H:%i:%s') AS updateTime
       FROM
         roles
         LEFT JOIN role_permissions rm ON rm.role_id = roles.wid
@@ -92,13 +108,13 @@ class RoleService {
         roles.level;
     `;
 
-    try {
-      const [ result ] = await connection.execute(statement, [ id ]);
-      return result;
-    } catch (error) {
-      console.log(error, "查询角色详情出错-db");
-      return false;
-    }
+		try {
+			const [result] = await connection.execute(statement, [id]);
+			return result;
+		} catch (error) {
+			console.log(error, "查询角色详情出错-db");
+			return false;
+		}
 	}
 
 	async queryRole(fieldKey, fieldValue) {

@@ -37,8 +37,6 @@ const buildWhereClause = (params, fieldSqlMap, likeField = likeFields) => {
 	let limitStatement = ";";
 	// 特殊字段
 	const specialField = ["limit", "offset", "startTime", "endTime"];
-	// 模糊查询字段
-
 	const { limit, offset, startTime, endTime } = params;
 	if (startTime && endTime) {
 		where.push("createAt BETWEEN  ? AND ? ");
@@ -57,6 +55,7 @@ const buildWhereClause = (params, fieldSqlMap, likeField = likeFields) => {
 			// 如果有值将对应的 sql 语句添加进去
 			where.push(fieldSqlMap[key]);
 
+      // 处理模糊查询字段
 			if (likeField.includes(key)) {
 				value = `%${value}%`;
 			}
@@ -77,6 +76,12 @@ const buildWhereClause = (params, fieldSqlMap, likeField = likeFields) => {
 	};
 };
 
+
+/**
+ * @description: 将所有可选参数转为 null，方便后续动态构建查询语句
+ * @param {*} params 参数
+ * @return {*} {}
+ */
 const filterOptionalParams = params => {
 	let optionalParams = { ...params };
 	for (const key in optionalParams) {

@@ -2,39 +2,105 @@ const connection = require("../app/database");
 const { buildWhereClause } = require("@/utils/format");
 const { queryTableTotal } = require("./public.service");
 
-
 class UserService {
 	async create(params) {
 		const {
 			username,
-      realname,
+			realname,
 			password,
 			phone,
 			departmentId,
 			roleId,
 			isActive,
 			roleName,
-			departmentName
+			departmentName,
+			avatarUrl
 		} = params;
+
 		const statement = `
       INSERT INTO users
-        (name, real_name, password, phone, department_id, role_id, is_active, role_name, department_name)
-      VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?);`;
+        (name, real_name, password, phone, department_id, role_id, is_active, role_name, department_name, avatar_url)
+      VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`;
+
 		try {
 			const [result] = await connection.execute(statement, [
 				username,
-        realname,
+				realname,
 				password,
 				phone,
 				departmentId,
 				roleId,
 				isActive,
 				roleName,
-				departmentName
+				departmentName,
+				avatarUrl
 			]);
+
 			return result;
 		} catch (err) {
-			console.log(err, "数据库插入用户出错");
+			console.log(err, "数据库插入用户出错-db");
+			return false;
+		}
+	}
+
+	async remove(id) {
+		const statement = "DELETE FROM users WHERE wid = ?";
+		try {
+			const [result] = await connection.execute(statement, [id]);
+			return result;
+		} catch (error) {
+			console.log(error, "删除用户出错-db");
+			return false;
+		}
+	}
+
+	async update(params) {
+		const {
+			wid,
+			username,
+			realname,
+			password,
+			phone,
+			departmentId,
+			roleId,
+			isActive,
+			roleName,
+			departmentName,
+			avatarUrl
+		} = params;
+		const statement = `
+      UPDATE users 
+      SET name = ?,
+          real_name = ?,
+          password = ?,
+          phone = ?,
+          department_id = ?,
+          department_name = ?,
+          role_id = ?,
+          role_name = ?,
+          is_active = ?,
+          avatar_url = ?
+      WHERE
+        wid = ?
+    `;
+
+		try {
+			const [result] = await connection.execute(statement, [
+				username,
+				realname,
+				password,
+				phone,
+				departmentId,
+				departmentName,
+				roleId,
+				roleName,
+				isActive,
+				avatarUrl,
+				wid
+			]);
+			return result;
+		} catch (error) {
+			console.log(error, "修改用户出错-db");
 			return false;
 		}
 	}
@@ -66,15 +132,18 @@ class UserService {
 	async getUserList(params) {
 		const fieldSqlMap = {
 			id: "wid = ?",
-      roleId: "role_id = ?",
-      departmentId: "department_id = ?",
+			roleId: "role_id = ?",
+			departmentId: "department_id = ?",
 			username: "name LIKE ?",
 			roleName: "role_name LIKE ?",
 			departmentName: "department_name LIKE ?",
 			phone: "phone LIKE ?"
 		};
 
-		const { where, values, limitStatement } = buildWhereClause(params, fieldSqlMap);
+		const { where, values, limitStatement } = buildWhereClause(
+			params,
+			fieldSqlMap
+		);
 		let statement = `
       SELECT
         wid,
@@ -94,12 +163,12 @@ class UserService {
 	      users 
         ${where}
       ORDER BY
-	      createAt DESC 
+	      updateAt DESC 
 	      ${limitStatement}
     `;
 
 		try {
-      const [ totalResult ] = await queryTableTotal("users", where, values);
+			const [totalResult] = await queryTableTotal("users", where, values);
 			const [result] = await connection.execute(statement, values);
 			return { total: totalResult.total, result };
 		} catch (error) {

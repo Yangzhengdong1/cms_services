@@ -81,10 +81,7 @@ const verifyDelete = async (ctx, next) => {
 };
 
 const verifyUpdate = async (ctx, next) => {
-	// const { wid, name, parentId, menus } = ctx.request.body;
-
-	// 判断当前 wid 是否存在
-	// const flag = await verifyDeptExist("wid", wid, ctx);
+  // todo：此处的更新比较复杂，暂时不做
 
 	await next();
 };
@@ -93,10 +90,11 @@ const verifyDeptAll = async (ctx, next) => {
 	console.log("部门校验 Middleware: verifyDeptAll~");
 
 	const { limitParams } = ctx.public;
-	const { id, departmentName, startTime, endTime } = ctx.request.body;
+	const { id, parentId, departmentName, startTime, endTime } = ctx.request.body;
 
 	const optionalParams = filterOptionalParams({
 		id,
+    parentId,
 		departmentName,
 		startTime,
 		endTime

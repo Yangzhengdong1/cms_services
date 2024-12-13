@@ -3,7 +3,8 @@ const {
 	ROLE_CREATE_NAME_IS_EXIST,
 	DEPT_NOT_FOUND,
 	ROLE_CREATE_ARGUMENT_IS_NOT_EMPTY,
-	ROLE_CREATE_ARGUMENT_TYPE_ERROR
+	ROLE_CREATE_ARGUMENT_TYPE_ERROR,
+	ROLE_NOT_FOUND
 } = require("../constant/messages");
 
 const { queryDepartment } = require("../services/dept.service");
@@ -57,13 +58,31 @@ const verifyCreate = async (ctx, next) => {
 	await next();
 };
 
+const verifyDelete = async (ctx, next) => {
+	console.log("角色校验 Middleware: verifyDelete~");
+
+	const { id } = ctx.params;
+	const result = await queryRole("wid", id);
+	if (Array.isArray(result) && !result.length) {
+		ctx.app.emit("message", ROLE_NOT_FOUND, ctx);
+		return;
+	}
+	await next();
+};
+
 const verifyRoleAll = async (ctx, next) => {
+	console.log("角色校验 Middleware: verifyRoleAll~");
+
 	const { limitParams } = ctx.public;
-	const { roleName, description, departmentId, level } = ctx.request.body;
+	const { roleName, description, departmentId, level, startTime, endTime } =
+		ctx.request.body;
+
 	const optionalParams = filterOptionalParams({
 		roleName,
 		description,
 		departmentId,
+		startTime,
+		endTime,
 		level
 	});
 
@@ -75,5 +94,6 @@ const verifyRoleAll = async (ctx, next) => {
 
 module.exports = {
 	verifyCreate,
+	verifyDelete,
 	verifyRoleAll
 };

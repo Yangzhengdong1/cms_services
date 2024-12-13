@@ -42,6 +42,7 @@ class DepartmentService {
 	async getDepartmentList(params) {
 		const fieldSqlMap = {
 			id: "wid = ?",
+			parentId: "parent_id = ?",
 			departmentName: "name LIKE ?"
 		};
 

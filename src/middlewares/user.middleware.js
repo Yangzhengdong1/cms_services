@@ -2,7 +2,9 @@ const {
 	CREATE_USER_ARGUMENT_IS_NOT_EMPTY,
 	ROLE_NOT_FOUND,
 	DEPT_NOT_FOUND,
-	ROLE_AND_DEPT_DO_NOT_MATCH
+	ROLE_AND_DEPT_DO_NOT_MATCH,
+	USER_NOT_FOUND,
+	USER_WID_IS_NOT_EMPTY
 } = require("@/constant/messages");
 const {
 	createError,
@@ -20,14 +22,22 @@ const { queryDepartment } = require("../services/dept.service");
 const { queryRolePermission } = require("../services/auth.service");
 
 /**
- * @description: 处理用户创建参数（不允许重名/必填参数：name、password、phone）
+ * @description: 处理用户参数（不允许重名/必填参数：name、password、phone）
  * @param {*} ctx
- * @param {*} next
+ * @param {*} wid 更新用户时用到
+ * @return {*} { isValid, params }
  */
-const verifyCreate = async (ctx, next) => {
-	console.log("用户校验 Middleware: verifyCreate~");
+const validateCondition = async (ctx, wid = "") => {
+	let isValid = true;
+	if (wid) {
+		const result = await queryUserExist("wid", wid);
+		if (Array.isArray(result) && !result.length) {
+			ctx.app.emit("message", USER_NOT_FOUND, ctx);
+			return { isValid: false };
+		}
+	}
 
-	const { name, realname, password, phone, departmentId, roleId, isActive } =
+	const { name, realname, password, phone, departmentId, roleId, isActive, avatarUrl } =
 		ctx.request.body;
 
 	// 判断必传参数
@@ -35,7 +45,7 @@ const verifyCreate = async (ctx, next) => {
 	const flag = requiredFields.every(item => !!item === true);
 	if (!flag) {
 		ctx.app.emit("message", CREATE_USER_ARGUMENT_IS_NOT_EMPTY, ctx);
-		return;
+		return { isValid: false };
 	}
 
 	// 判断数据库中是否已有当前用户
@@ -50,13 +60,12 @@ const verifyCreate = async (ctx, next) => {
 		result.length > 0
 	) {
 		createError(ACCOUNT_ALREADY_EXISTS, ctx);
-		return;
+		return { isValid: false };
 	}
 
 	// 查询角色名称
 	if (roleId) {
 		roleResult = await queryRole("wid", roleId);
-		console.log(roleResult, "roleResult");
 		if (
 			Object.prototype.toString.call(roleResult) === "[object Array]" &&
 			roleResult.length > 0
@@ -64,7 +73,7 @@ const verifyCreate = async (ctx, next) => {
 			roleName = roleResult[0].name;
 		} else {
 			ctx.app.emit("message", ROLE_NOT_FOUND, ctx);
-			return;
+			return { isValid: false };
 		}
 	}
 
@@ -78,34 +87,97 @@ const verifyCreate = async (ctx, next) => {
 			departmentName = deptResult[0].name;
 		} else {
 			ctx.app.emit("message", DEPT_NOT_FOUND, ctx);
-			return;
+			return { isValid: false };
 		}
 	}
 
 	// 查询当前角色是否在对应的部门下
 	if (roleName && roleResult[0].department_id !== departmentId) {
 		ctx.app.emit("message", ROLE_AND_DEPT_DO_NOT_MATCH, ctx);
-		return;
+		return { isValid: false };
 	}
 
 	if (result === false || roleResult === false || deptResult === false) {
 		createError(INTERNAL_PROBLEMS, ctx);
-		return;
+		return { isValid: false };
 	}
 
 	const params = {
 		username: name,
-    realname,
+		realname,
 		password: hashEncryption(password),
 		phone,
 		departmentId: departmentId ? departmentId : null,
 		roleId: roleId ? roleId : null,
 		isActive: isActive ? 1 : 0,
 		roleName,
-		departmentName
+		departmentName,
+    avatarUrl: avatarUrl ? avatarUrl : ""
 	};
 
+	if (wid) {
+		params.wid = wid;
+	}
+
+	return { isValid, params };
+};
+
+/**
+ * @description:创建用户
+ * @param {*} ctx
+ * @param {*} next
+ */
+const verifyCreate = async (ctx, next) => {
+	console.log("用户校验 Middleware: verifyCreate~");
+
+	const { isValid, params } = await validateCondition(ctx);
+	if (!isValid) {
+		return;
+	}
 	ctx.user = { createParams: params };
+
+	await next();
+};
+
+/**
+ * @description: 删除用户
+ * @param {*} ctx
+ * @param {*} next
+ */
+const verifyDelete = async (ctx, next) => {
+	console.log("用户校验 Middleware: verifyDelete~");
+
+	const { id } = ctx.params;
+	const result = await queryUserExist("wid", id);
+	if (Array.isArray(result) && !result.length) {
+		ctx.app.emit("message", USER_NOT_FOUND, ctx);
+		return;
+	}
+
+	await next();
+};
+
+/**
+ * @description: 更新用户
+ * @param {*} ctx
+ * @param {*} next
+ */
+const verifyUpdate = async (ctx, next) => {
+	console.log("用户校验 Middleware: verifyUpdate~");
+
+	const { wid } = ctx.request.body;
+	if (!wid) {
+		ctx.app.emit("message", USER_WID_IS_NOT_EMPTY, ctx);
+		return;
+	}
+
+	const { isValid, params } = await validateCondition(ctx, wid);
+
+	if (!isValid) {
+		return;
+	}
+
+	ctx.user = { updateParams: params };
 
 	await next();
 };
@@ -133,19 +205,33 @@ const verifyInfo = async (ctx, next) => {
 	await next();
 };
 
+/**
+ * @description: 分页查询用户列表
+ * @param {*} ctx
+ * @param {*} next
+ */
 const verifyUserAll = async (ctx, next) => {
 	console.log("用户校验 Middleware: verifyUserAll~");
 
 	// 可选参数
-	let { id, username, roleName, roleId, departmentName, departmentId, phone, startTime, endTime } =
-		ctx.request.body;
+	let {
+		id,
+		username,
+		roleName,
+		roleId,
+		departmentName,
+		departmentId,
+		phone,
+		startTime,
+		endTime
+	} = ctx.request.body;
 	const optionalParams = {
 		id,
 		username,
 		roleName,
-    roleId,
+		roleId,
 		departmentName,
-    departmentId,
+		departmentId,
 		phone,
 		startTime,
 		endTime
@@ -168,6 +254,8 @@ const verifyUserAll = async (ctx, next) => {
 
 module.exports = {
 	verifyCreate,
+	verifyDelete,
+	verifyUpdate,
 	verifyInfo,
 	verifyUserAll
 };

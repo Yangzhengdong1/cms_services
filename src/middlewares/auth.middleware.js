@@ -23,6 +23,7 @@ const authVerify = async (ctx, next) => {
 
   // 获取当前操作权限名称
   const { url } = ctx.request;
+  console.log(url.split("/").splice(0, 3).join("/"));
   const permName = urlToPermMap[url.split("/").splice(0, 3).join("/")];
 
 	const { authorization } = ctx.headers;

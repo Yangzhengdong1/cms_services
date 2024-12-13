@@ -1,7 +1,13 @@
 const { createError, INTERNAL_PROBLEMS } = require("../constant/error-types");
 const { queryRolePermission } = require("../services/auth.service");
 const { rolePerm } = require("../services/public.service");
-const { create, queryRole, getRoleList, getRoleInfo } = require("../services/role.service");
+const {
+	create,
+  remove,
+	queryRole,
+	getRoleList,
+	getRoleInfo
+} = require("../services/role.service");
 
 class RoleController {
 	async createRole(ctx) {
@@ -43,6 +49,22 @@ class RoleController {
 		};
 	}
 
+	async deleteRole(ctx) {
+		const { id } = ctx.params;
+
+		const result = await remove(id);
+
+		if (!result) {
+			createError(INTERNAL_PROBLEMS, ctx);
+			return;
+		}
+
+		ctx.body = {
+			code: 0,
+			message: "删除成功~"
+		};
+	}
+
 	async getPermossionList(ctx) {
 		const { roleId } = ctx.auth.userInfo;
 
@@ -81,7 +103,7 @@ class RoleController {
 	}
 
 	async getRoleDetail(ctx) {
-    const { id } = ctx.params;
+		const { id } = ctx.params;
 		let [result] = await getRoleInfo(id);
 
 		if (!result) {
@@ -89,8 +111,7 @@ class RoleController {
 			return;
 		}
 
-    result.permissions = result.permissions.filter(item => item !== null);
-
+		result.permissions = result.permissions.filter(item => item !== null);
 
 		ctx.body = {
 			code: 0,

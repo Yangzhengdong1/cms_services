@@ -11,6 +11,10 @@ const PERM_CREATE_NAME_IS_EXIST = "权限名称重复！";
 
 const DICT_TABLE_NOT_FOUND = "字典表不存在！";
 
+const USER_NOT_FOUND = "用户不存在！";
+const USER_WID_IS_NOT_EMPTY = "用户id不能为空！";
+
+
 const ROLE_PERM_ARGUMENT_IS_NOT_EMPTY = "角色id/权限列表参数不能为空!";
 const ROLE_NOT_FOUND = "角色不存在！";
 const ROLE_CREATE_NAME_IS_EXIST = "角色名称重复！";
@@ -52,5 +56,8 @@ module.exports = {
 
 	ROLE_AND_DEPT_DO_NOT_MATCH,
 
-  MENU_DEPT_ARGUMENT_IS_NOT_EMPTY
+  MENU_DEPT_ARGUMENT_IS_NOT_EMPTY,
+
+  USER_NOT_FOUND,
+  USER_WID_IS_NOT_EMPTY
 };
