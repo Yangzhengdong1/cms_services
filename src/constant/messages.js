@@ -17,6 +17,7 @@ const USER_WID_IS_NOT_EMPTY = "用户id不能为空！";
 
 const ROLE_PERM_ARGUMENT_IS_NOT_EMPTY = "角色id/权限列表参数不能为空!";
 const ROLE_NOT_FOUND = "角色不存在！";
+const ROLE_WID_IS_NOT_EMPTY = "角色id不能为空！";
 const ROLE_CREATE_NAME_IS_EXIST = "角色名称重复！";
 const ROLE_CREATE_ARGUMENT_IS_NOT_EMPTY = "角色名称/部门不能为空！";
 const ROLE_CREATE_ARGUMENT_TYPE_ERROR = "permissions字段需要为数组类型！";
@@ -25,6 +26,9 @@ const ROLE_CREATE_ARGUMENT_TYPE_ERROR = "permissions字段需要为数组类型�
 const DEPT_NOT_FOUND = "部门不存在！";
 const DEPT_NAME_IS_EXIST = "部门名称重复！";
 const DEPT_CREATE_ARGUMENT_IS_NOT_EMPTY = "部门名称不能为空！";
+const DEPT_CREATE_ARGUMENT_TYPE_ERROR = "menus字段需要为数组类型！！";
+const DEPT_WID_IS_NOT_EMPTY = "部门id不能为空！";
+
 
 const MENU_DEPT_ARGUMENT_IS_NOT_EMPTY = "部门id/菜单列表不能为空！";
 
@@ -49,10 +53,13 @@ module.exports = {
   ROLE_CREATE_NAME_IS_EXIST,
   ROLE_CREATE_ARGUMENT_IS_NOT_EMPTY,
   ROLE_CREATE_ARGUMENT_TYPE_ERROR,
+  ROLE_WID_IS_NOT_EMPTY,
 
 	DEPT_NOT_FOUND,
 	DEPT_CREATE_ARGUMENT_IS_NOT_EMPTY,
   DEPT_NAME_IS_EXIST,
+  DEPT_CREATE_ARGUMENT_TYPE_ERROR,
+  DEPT_WID_IS_NOT_EMPTY,
 
 	ROLE_AND_DEPT_DO_NOT_MATCH,
 

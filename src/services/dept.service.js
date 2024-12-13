@@ -1,6 +1,6 @@
 const connection = require("../app/database");
 const { buildWhereClause } = require("../utils/format");
-const { queryTableTotal } = require("./public.service");
+const { queryTableTotal, removeMenuDept } = require("./public.service");
 
 class DepartmentService {
 	async create(params) {
@@ -11,6 +11,26 @@ class DepartmentService {
 			return result;
 		} catch (error) {
 			console.log(error, "创建部门出错-db");
+			return false;
+		}
+	}
+
+	async update(params) {
+		const { name, parentId, wid } = params;
+
+		const statement =
+			"UPDATE departments SET name = ?, parent_id = ? WHERE wid = ?";
+
+		try {
+      await removeMenuDept("department_id", wid);
+			const [result] = await connection.execute(statement, [
+				name,
+				parentId,
+				wid
+			]);
+			return result;
+		} catch (error) {
+			console.log(error, "更新部门出错-db");
 			return false;
 		}
 	}

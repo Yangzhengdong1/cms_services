@@ -1,7 +1,9 @@
 const {
 	DEPT_CREATE_ARGUMENT_IS_NOT_EMPTY,
 	DEPT_NAME_IS_EXIST,
-	DEPT_NOT_FOUND
+	DEPT_NOT_FOUND,
+	DEPT_CREATE_ARGUMENT_TYPE_ERROR,
+	DEPT_WID_IS_NOT_EMPTY
 } = require("../constant/messages.js");
 const {
 	createError,
@@ -26,41 +28,70 @@ const verifyDeptExist = async (fliedKey, fliedValue, ctx) => {
 	return flag;
 };
 
-const verifyCreate = async (ctx, next) => {
-	console.log("部门校验 Middleware: verifyCreate~");
-
+/**
+ * @description: 处理部门创建/更新参数
+ * @param {*} ctx
+ * @param {*} wid 更新用户时用到
+ * @return {*} { isValid, params }
+ */
+const validateCondition = async (ctx, wid = "") => {
+	if (wid) {
+		const widExistFlag = await verifyDeptExist("wid", wid, ctx);
+		if (!widExistFlag) {
+			return { isValid: false };
+		}
+	}
 	const { name, parentId, menus } = ctx.request.body;
+
+	// 判断必传参数
 	if (!name) {
 		ctx.app.emit("message", DEPT_CREATE_ARGUMENT_IS_NOT_EMPTY, ctx);
-		return;
+		return { isValid: false };
 	}
 
+	// 判断menus字段类型
 	if (!Array.isArray(menus)) {
-		ctx.app.emit("message", "menus字段需要为数组类型！", ctx);
-		return;
+		ctx.app.emit("message", DEPT_CREATE_ARGUMENT_TYPE_ERROR, ctx);
+		return { isValid: false };
 	}
 
-	// 判断当前部门名称是否存在
+	// 名称唯一性校验
 	const result = await queryDepartment("name", name);
 	if (Array.isArray(result) && result.length > 0) {
-		ctx.app.emit("message", DEPT_NAME_IS_EXIST, ctx);
-		return;
+		// 更新时需要排除自身
+		if (!wid || wid !== result[0].wid) {
+      ctx.app.emit("message", DEPT_NAME_IS_EXIST, ctx);
+			return { isValid: false };
+		}
 	}
 
 	// 判断 parentId 是否存在
 	if (parentId) {
-		const res = await queryDepartment("wid", parentId);
-		if (Array.isArray(res) && res.length <= 0) {
-			ctx.app.emit("message", DEPT_NOT_FOUND, ctx);
-			return;
+		const parentIdExist = await verifyDeptExist("wid", parentId, ctx);
+		if (!parentIdExist) {
+			return { isValid: false };
 		}
 	}
 
 	const params = {
 		name,
 		parentId: parentId ? parentId : null,
-		menus
+		menus,
+		...(wid && { wid })
 	};
+
+	return { isValid: true, params };
+};
+
+const verifyCreate = async (ctx, next) => {
+	console.log("部门校验 Middleware: verifyCreate~");
+
+	const { isValid, params } = await validateCondition(ctx);
+
+	if (!isValid) {
+		return;
+	}
+
 	ctx.department = { createParams: params };
 
 	await next();
@@ -81,7 +112,20 @@ const verifyDelete = async (ctx, next) => {
 };
 
 const verifyUpdate = async (ctx, next) => {
-  // todo：此处的更新比较复杂，暂时不做
+	console.log("部门校验 Middleware: verifyUpdate~");
+
+	const { wid } = ctx.request.body;
+	if (!wid) {
+		ctx.app.emit("message", DEPT_WID_IS_NOT_EMPTY, ctx);
+		return;
+	}
+
+	const { isValid, params } = await validateCondition(ctx, wid);
+	if (!isValid) {
+		return;
+	}
+
+	ctx.department = { updateParams: params };
 
 	await next();
 };
@@ -94,7 +138,7 @@ const verifyDeptAll = async (ctx, next) => {
 
 	const optionalParams = filterOptionalParams({
 		id,
-    parentId,
+		parentId,
 		departmentName,
 		startTime,
 		endTime

@@ -1,9 +1,11 @@
 const { createError, INTERNAL_PROBLEMS } = require("../constant/error-types");
 const { queryRolePermission } = require("../services/auth.service");
 const { rolePerm } = require("../services/public.service");
+
 const {
 	create,
-  remove,
+	remove,
+	update,
 	queryRole,
 	getRoleList,
 	getRoleInfo
@@ -62,6 +64,32 @@ class RoleController {
 		ctx.body = {
 			code: 0,
 			message: "删除成功~"
+		};
+	}
+
+	async updateRole(ctx) {
+		const { wid: roleId, name: roleName, permissions } = ctx.role.updateParams;
+
+		// 更新角色信息
+		const result = await update(ctx.role.updateParams);
+		if (!result) {
+			createError(INTERNAL_PROBLEMS, ctx);
+			return;
+		}
+
+		// 更新角色权限
+		if (permissions.length > 0) {
+			console.log("角色权限关联-update");
+			const res = await rolePerm({ roleId, roleName, permissions });
+			if (!res) {
+				createError(INTERNAL_PROBLEMS, ctx);
+				return;
+			}
+		}
+
+		ctx.body = {
+			code: 0,
+			message: "更新成功~"
 		};
 	}
 

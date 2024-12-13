@@ -1,6 +1,6 @@
 const connection = require("../app/database");
 const { buildWhereClause } = require("../utils/format");
-const { queryTableTotal } = require("./public.service");
+const { queryTableTotal, removeRolePerm } = require("./public.service");
 
 class RoleService {
 	async create(params) {
@@ -32,6 +32,20 @@ class RoleService {
 			return false;
 		}
 	}
+
+  async update(params) {
+    const { name, departmentId, description, level, wid } = params;
+    const statement = "UPDATE roles SET name = ?, department_id = ?, description = ?, level = ? WHERE wid = ?";
+    try {
+      // 删除角色原有权限
+      await removeRolePerm("role_id", wid);
+      const [ result ] = await connection.execute(statement, [name, departmentId, description, level, wid]);
+      return result;
+    } catch (error) {
+      console.log(error, "更新角色出错-db");
+      return false;
+    }
+  }
 
 	async getRoleList(params) {
 		const fieldSqlMap = {

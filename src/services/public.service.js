@@ -13,7 +13,7 @@ const handleBatchStatement = (doubleArray, statement) => {
 
 class PublicService {
 	async queryDictTable(name, fields = ["wid", "name"]) {
-    let fieldStr = fields.join(", ");
+		let fieldStr = fields.join(", ");
 		const statement = ` SELECT ${fieldStr} FROM ${name} ORDER BY createAt DESC;`;
 		try {
 			const [result] = await connection.execute(statement, []);
@@ -35,14 +35,16 @@ class PublicService {
 		}
 	}
 
+	// 角色权限关联
 	async rolePerm(params) {
 		const { roleId, roleName, permissions } = params;
 		const paramArray = permissions.map(permission => {
 			return [roleId, roleName, permission.wid, permission.name];
 		});
 
-		const fragment = "INSERT IGNORE INTO role_permissions (role_id, role_name, permission_id, permission_name) VALUES ";
-    const [ statement, values ] = handleBatchStatement(paramArray, fragment);
+		const fragment =
+			"INSERT IGNORE INTO role_permissions (role_id, role_name, permission_id, permission_name) VALUES ";
+		const [statement, values] = handleBatchStatement(paramArray, fragment);
 
 		try {
 			const [result] = await connection.execute(statement, values);
@@ -53,6 +55,20 @@ class PublicService {
 		}
 	}
 
+	// 删除角色权限关联
+	async removeRolePerm(fieldKey, fieldValue) {
+		const statement = `DELETE FROM role_permissions WHERE ${fieldKey} = ?`;
+
+		try {
+			const [result] = await connection.execute(statement, [fieldValue]);
+			return result;
+		} catch (error) {
+			console.log(error, "删除角色权限出错-db");
+			throw new Error(error);
+		}
+	}
+
+	// 菜单部门关联
 	async menuDept(params) {
 		const { departmentId, departmentName, menus } = params;
 		const doubleArray = menus.map(menu => {
@@ -65,23 +81,37 @@ class PublicService {
 
 		try {
 			const [result] = await connection.execute(statement, values);
-      return result;
+			return result;
 		} catch (error) {
 			console.log(error, "关联部门菜单出错-db");
 			return false;
 		}
 	}
 
-  async queryTableTotal(tableName, where = "", values = []) {
-    values = values.slice(0, -2);
-    const statement = `SELECT COUNT(*) AS total FROM ${tableName} ${where};`;
-    try {
-      const [ result ] = await connection.execute(statement, values);
-      return result;
-    } catch (error) {
-      throw new Error(error);
-    }
-  }
+	// 删除部门菜单
+	async removeMenuDept(fieldKey, fieldValue) {
+		const statement = `DELETE FROM department_menus WHERE ${fieldKey} = ?`;
+
+		try {
+			const [result] = await connection.execute(statement, [fieldValue]);
+			return result;
+		} catch (error) {
+			console.log(error, "删除部门菜单出错-db");
+			throw new Error(error);
+		}
+	}
+
+	// 查询 total
+	async queryTableTotal(tableName, where = "", values = []) {
+		values = values.slice(0, -2);
+		const statement = `SELECT COUNT(*) AS total FROM ${tableName} ${where};`;
+		try {
+			const [result] = await connection.execute(statement, values);
+			return result;
+		} catch (error) {
+			throw new Error(error);
+		}
+	}
 }
 
 module.exports = new PublicService();
