@@ -96,6 +96,10 @@ class UserController {
 
 	async getUserAll(ctx) {
 		const { getListParams } = ctx.user;
+    // 判断 status 是否传递
+    if (typeof getListParams.status === "boolean") {
+      getListParams.status = getListParams.status === false ? 0 : 1;
+    }
 		const { total, result, status } = await getUserList(getListParams);
 		if (status) {
 			createError(INTERNAL_PROBLEMS, ctx);

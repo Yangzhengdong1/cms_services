@@ -216,6 +216,7 @@ const verifyUserAll = async (ctx, next) => {
 	// 可选参数
 	let {
 		id,
+    status,
 		username,
 		roleName,
 		roleId,
@@ -227,6 +228,7 @@ const verifyUserAll = async (ctx, next) => {
 	} = ctx.request.body;
 	const optionalParams = {
 		id,
+    status,
 		username,
 		roleName,
 		roleId,

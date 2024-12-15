@@ -13,7 +13,7 @@ class GoodsController {
 
 		ctx.body = {
 			code: 0,
-			total: total,
+			totalCount: total,
 			list: result,
 			message: "查询成功~"
 		};

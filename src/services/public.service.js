@@ -14,7 +14,7 @@ const handleBatchStatement = (doubleArray, statement) => {
 class PublicService {
 	async queryDictTable(name, fields = ["wid", "name"]) {
 		let fieldStr = fields.join(", ");
-		const statement = ` SELECT ${fieldStr} FROM ${name} ORDER BY createAt DESC;`;
+		const statement = ` SELECT ${fieldStr} FROM ${name} ORDER BY updateAt DESC;`;
 		try {
 			const [result] = await connection.execute(statement, []);
 			return result;

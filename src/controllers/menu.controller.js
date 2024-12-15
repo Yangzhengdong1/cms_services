@@ -7,6 +7,7 @@ const {
 	remove,
 	getMenuList
 } = require("../services/menu.service");
+const { queryDictTable } = require("../services/public.service");
 const { arrayToTree } = require("../utils/format");
 
 class MenuCoutroller {
@@ -25,19 +26,6 @@ class MenuCoutroller {
 		};
 	}
 
-	async updateMenu(ctx) {
-		const { updateParams } = ctx.menu;
-		const result = await update(updateParams);
-		if (!result) {
-			createError(INTERNAL_PROBLEMS, ctx);
-			return;
-		}
-		ctx.body = {
-			code: 0,
-			message: "修改菜单成功~"
-		};
-	}
-
 	async deleteMenu(ctx) {
 		const { id } = ctx.params;
 		const result = await remove(id);
@@ -50,6 +38,19 @@ class MenuCoutroller {
 		ctx.body = {
 			code: 0,
 			message: "删除菜单成功~"
+		};
+	}
+
+	async updateMenu(ctx) {
+		const { updateParams } = ctx.menu;
+		const result = await update(updateParams);
+		if (!result) {
+			createError(INTERNAL_PROBLEMS, ctx);
+			return;
+		}
+		ctx.body = {
+			code: 0,
+			message: "修改菜单成功~"
 		};
 	}
 
@@ -88,6 +89,31 @@ class MenuCoutroller {
 			code: 0,
 			total: result.length,
 			data: result,
+			message: "查询成功~"
+		};
+	}
+
+	async getMenuTree(ctx) {
+		let result = await queryDictTable("menus", [
+			"name",
+			"wid",
+      "icon",
+      "url",
+      "DATE_FORMAT(createAt, '%Y-%m-%d %H:%i:%s') AS createTime",
+      " DATE_FORMAT(updateAt, '%Y-%m-%d %H:%i:%s') AS updateTime",
+			"parent_id AS parentId"
+		]);
+
+		if (!result) {
+			createError(INTERNAL_PROBLEMS, ctx);
+			return;
+		}
+
+		result = arrayToTree(result);
+
+		ctx.body = {
+			code: 0,
+			list: result,
 			message: "查询成功~"
 		};
 	}

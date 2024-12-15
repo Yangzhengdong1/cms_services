@@ -137,7 +137,8 @@ class UserService {
 			username: "name LIKE ?",
 			roleName: "role_name LIKE ?",
 			departmentName: "department_name LIKE ?",
-			phone: "phone LIKE ?"
+			phone: "phone LIKE ?",
+			status: "is_active = ?"
 		};
 
 		const { where, values, limitStatement } = buildWhereClause(
