@@ -6,8 +6,8 @@ const {
 	ROLE_AND_DEPT_DO_NOT_MATCH,
 	USER_NOT_FOUND,
 	USER_WID_IS_NOT_EMPTY,
-  USER_CANNOT_BE_DELETED_INITIAL,
-  USER_CANNOT_BE_DELETED_LOGIN
+	USER_CANNOT_BE_DELETED_INITIAL,
+	USER_CANNOT_BE_DELETED_LOGIN
 } = require("@/constant/messages");
 const {
 	createError,
@@ -162,21 +162,21 @@ const verifyDelete = async (ctx, next) => {
 	console.log("用户校验 Middleware: verifyDelete~");
 
 	const { id } = ctx.params;
-  const { wid } = ctx.auth.userInfo;
+	const { wid } = ctx.auth.userInfo;
 
-  // 判断删除的用户是否是当前登录用户
-  if (id === wid) {
-    ctx.app.emit("message", USER_CANNOT_BE_DELETED_LOGIN, ctx);
-    return;
-  }
+	// 判断删除的用户是否是当前登录用户
+	if (id === wid) {
+		ctx.app.emit("message", USER_CANNOT_BE_DELETED_LOGIN, ctx);
+		return;
+	}
 
-  // 判断删除的用户是否是初始用户
-  if (id === INITIAL_USER_ID) {
-    ctx.app.emit("message", USER_CANNOT_BE_DELETED_INITIAL, ctx);
-    return;
-  }
+	// 判断删除的用户是否是初始用户
+	if (id === INITIAL_USER_ID) {
+		ctx.app.emit("message", USER_CANNOT_BE_DELETED_INITIAL, ctx);
+		return;
+	}
 
-  // 判断用户是否存在
+	// 判断用户是否存在
 	const result = await queryUserExist("wid", id);
 	if (Array.isArray(result) && !result.length) {
 		ctx.app.emit("message", USER_NOT_FOUND, ctx);
@@ -247,7 +247,7 @@ const verifyUserAll = async (ctx, next) => {
 		id,
 		status,
 		username,
-    realname,
+		realname,
 		roleName,
 		roleId,
 		departmentName,
@@ -260,7 +260,7 @@ const verifyUserAll = async (ctx, next) => {
 		id,
 		status,
 		username,
-    realname,
+		realname,
 		roleName,
 		roleId,
 		departmentName,
@@ -272,7 +272,12 @@ const verifyUserAll = async (ctx, next) => {
 	for (const key in optionalParams) {
 		if (Object.prototype.hasOwnProperty.call(optionalParams, key)) {
 			let element = optionalParams[key];
-			optionalParams[key] = element ? element : null;
+      // 判断 status 是否传递
+			if (key === "status" && typeof element === "boolean") {
+				optionalParams[key] = element === false ? 0 : 1;
+			} else {
+				optionalParams[key] = element ? element : null;
+			}
 		}
 	}
 

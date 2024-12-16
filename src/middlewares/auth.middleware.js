@@ -94,6 +94,7 @@ const passwordVerify = async (ctx, next) => {
  * @param {*} ctx
  * @param {*} next
  */
+// eslint-disable-next-line no-unused-vars
 const initialUserVerify = async (ctx) => {
 	const { wid } = ctx.userInfo;
   const isInitialUser = wid === INITIAL_USER_ID;
