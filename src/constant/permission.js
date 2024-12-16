@@ -23,6 +23,11 @@ const ROLE_DELETE = "role_delete";
 const ROLE_UPDATE = "role_update";
 const ROLE_QUERY = "role_query";
 
+const GOODS_CREATE = "goods_create";
+const GOODS_DELETE = "goods_delete";
+const GOODS_UPDATE = "goods_update";
+const GOODS_QUERY = "goods_query";
+
 const UPLOAD_IMG = "upload_img";
 const UPLOAD_FILE = "upload_file";
 
@@ -60,7 +65,14 @@ const urlToPermMap = {
 	"/role/get-permission-list": ROLE_QUERY,
 	"/role/get-list": ROLE_QUERY,
 
-	"/upload/img": UPLOAD_IMG,
+  "/goods/create": GOODS_CREATE,
+	"/goods/delete": GOODS_DELETE,
+	"/goods/update": GOODS_UPDATE,
+	"/goods/query": GOODS_QUERY,
+	"/goods/detail": GOODS_QUERY,
+	"/goods/get-list": GOODS_QUERY,
+
+	"/upload/upload-img": UPLOAD_IMG,
 	"/upload/file": UPLOAD_FILE
 };
 

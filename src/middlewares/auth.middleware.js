@@ -13,6 +13,18 @@ const { comparePerm, urlToPermMap } = require("../constant/permission");
 const { INITIAL_USER_ID } = require("@/app/config");
 const { queryRolePermission } = require("../services/auth.service");
 
+
+/**
+ * @description: 校验初始用户（初始用户无需校验权限，拥有整个系统的控制权）
+ * @param {*} userInfo
+ * @return {*} isInitialUser
+ */
+const initialUserVerify = (userInfo) => {
+	const { wid } = userInfo;
+  const isInitialUser = wid === INITIAL_USER_ID;
+  return isInitialUser;
+};
+
 /**
  * @description: 校验 token
  * @param {*} ctx
@@ -39,22 +51,16 @@ const authVerify = async (ctx, next) => {
 		return;
 	}
 
-	console.log("解密后的用户信息：", result);
-	ctx.auth = { userInfo: { ...result, permName } };
+  // 校验初始用户
+  const isInitialUser = initialUserVerify(result);
+
+	// console.log("解密后的用户信息：", result);
+	ctx.auth = { userInfo: { ...result, permName, isInitialUser } };
+  console.log("用户信息：", ctx.auth.userInfo);
+
 	await next();
 };
 
-/**
- * @description: 校验初始用户（初始用户无需校验权限，拥有整个系统的控制权）
- * @param {*} ctx
- * @param {*} next
- */
-const initialUserVerify = async (ctx) => {
-	const { wid } = ctx.auth.userInfo;
-  const isInitialUser = wid === INITIAL_USER_ID;
-  // ctx.auth.userInfo.isInitialUser = isInitialUser;
-  return isInitialUser;
-};
 
 /**
  * @description: 判断当前角色是否拥有操作权限
@@ -64,22 +70,23 @@ const initialUserVerify = async (ctx) => {
 const permVerify = async (ctx, next) => {
 	console.log("权限校验 Middleware: permVerify");
 
+	const { roleId, permName, isInitialUser } = ctx.auth.userInfo;
+
   // 判断初始用户
-  const isInitialUser = await initialUserVerify(ctx);
   if (isInitialUser) {
     console.log("权限校验 Middleware: 初始用户~");
     await next();
     return;
   }
 
-	const { roleId, permName } = ctx.auth.userInfo;
+  // 查询角色权限
 	const result = await queryRolePermission(roleId);
-
 	if (!result) {
 		createError(INTERNAL_PROBLEMS, ctx);
 		return;
 	}
 
+  // 判断角色权限
 	console.log(result, permName);
 	if (!comparePerm(result, permName)) {
 		createError(NO_PERMISSION, ctx);
@@ -113,6 +120,5 @@ const passwordVerify = async (ctx, next) => {
 module.exports = {
 	authVerify,
 	passwordVerify,
-	permVerify,
-  initialUserVerify
+	permVerify
 };

@@ -1,5 +1,4 @@
 const { createError, INTERNAL_PROBLEMS } = require("../constant/error-types");
-const { initialUserVerify } = require("../middlewares/auth.middleware");
 const {
 	getMenu,
 	update,
@@ -60,10 +59,9 @@ class MenuCoutroller {
 	 * @param {*} ctx
 	 */
 	async getUserMenu(ctx) {
-		const { departmentId } = ctx.auth.userInfo;
+		const { departmentId, isInitialUser } = ctx.auth.userInfo;
 
     // 判断初始用户
-    const isInitialUser = await initialUserVerify(ctx);
     const result = isInitialUser ? await getMenu() : await getMenu(departmentId);
 		if (!result) {
 			createError(INTERNAL_PROBLEMS, ctx);
