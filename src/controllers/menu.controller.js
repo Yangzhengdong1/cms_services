@@ -1,4 +1,5 @@
 const { createError, INTERNAL_PROBLEMS } = require("../constant/error-types");
+const { initialUserVerify } = require("../middlewares/auth.middleware");
 const {
 	getMenu,
 	update,
@@ -60,7 +61,10 @@ class MenuCoutroller {
 	 */
 	async getUserMenu(ctx) {
 		const { departmentId } = ctx.auth.userInfo;
-		const result = await getMenu(departmentId);
+
+    // 判断初始用户
+    const isInitialUser = await initialUserVerify(ctx);
+    const result = isInitialUser ? await getMenu() : await getMenu(departmentId);
 		if (!result) {
 			createError(INTERNAL_PROBLEMS, ctx);
 			return;
@@ -97,10 +101,10 @@ class MenuCoutroller {
 		let result = await queryDictTable("menus", [
 			"name",
 			"wid",
-      "icon",
-      "url",
-      "DATE_FORMAT(createAt, '%Y-%m-%d %H:%i:%s') AS createTime",
-      " DATE_FORMAT(updateAt, '%Y-%m-%d %H:%i:%s') AS updateTime",
+			"icon",
+			"url",
+			"DATE_FORMAT(createAt, '%Y-%m-%d %H:%i:%s') AS createTime",
+			" DATE_FORMAT(updateAt, '%Y-%m-%d %H:%i:%s') AS updateTime",
 			"parent_id AS parentId"
 		]);
 

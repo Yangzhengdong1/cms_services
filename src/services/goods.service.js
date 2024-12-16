@@ -30,9 +30,6 @@ class GoodsService {
         ${limitStatement}
     `;
 
-    console.log(statement, "sssss");
-    console.log(values, "ssssss");
-
 		try {
 			const [totalResult] = await queryTableTotal("goods", where, values);
 			const [result] = await connection.execute(statement, values);

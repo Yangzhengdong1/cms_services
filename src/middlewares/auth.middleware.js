@@ -45,12 +45,32 @@ const authVerify = async (ctx, next) => {
 };
 
 /**
+ * @description: 校验初始用户（初始用户无需校验权限，拥有整个系统的控制权）
+ * @param {*} ctx
+ * @param {*} next
+ */
+const initialUserVerify = async (ctx) => {
+	const { wid } = ctx.auth.userInfo;
+  const isInitialUser = wid === INITIAL_USER_ID;
+  // ctx.auth.userInfo.isInitialUser = isInitialUser;
+  return isInitialUser;
+};
+
+/**
  * @description: 判断当前角色是否拥有操作权限
  * @param {*} ctx
  * @param {*} next
  */
 const permVerify = async (ctx, next) => {
 	console.log("权限校验 Middleware: permVerify");
+
+  // 判断初始用户
+  const isInitialUser = await initialUserVerify(ctx);
+  if (isInitialUser) {
+    console.log("权限校验 Middleware: 初始用户~");
+    await next();
+    return;
+  }
 
 	const { roleId, permName } = ctx.auth.userInfo;
 	const result = await queryRolePermission(roleId);
@@ -89,20 +109,10 @@ const passwordVerify = async (ctx, next) => {
 	await next();
 };
 
-/**
- * @description: 校验初始用户
- * @param {*} ctx
- * @param {*} next
- */
-// eslint-disable-next-line no-unused-vars
-const initialUserVerify = async (ctx) => {
-	const { wid } = ctx.userInfo;
-  const isInitialUser = wid === INITIAL_USER_ID;
-  return isInitialUser;
-};
 
 module.exports = {
 	authVerify,
 	passwordVerify,
-	permVerify
+	permVerify,
+  initialUserVerify
 };
