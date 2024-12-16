@@ -5,13 +5,13 @@ const {
 	createError,
 	UNAUTHORIZED,
 	ERROR_INCORRECT_USERNAME_OR_PASSWORD,
-  INTERNAL_PROBLEMS,
-  NO_PERMISSION
+	INTERNAL_PROBLEMS,
+	NO_PERMISSION
 } = require("../constant/error-types");
 const { comparePerm, urlToPermMap } = require("../constant/permission");
 
+const { INITIAL_USER_ID } = require("@/app/config");
 const { queryRolePermission } = require("../services/auth.service");
-
 
 /**
  * @description: 校验 token
@@ -21,10 +21,11 @@ const { queryRolePermission } = require("../services/auth.service");
 const authVerify = async (ctx, next) => {
 	console.log("权限校验 Middleware：authVerify~");
 
-  // 获取当前操作权限名称
-  const { url } = ctx.request;
-  const permName = urlToPermMap[url.split("/").splice(0, 3).join("/")];
+	// 获取当前操作权限名称
+	const { url } = ctx.request;
+	const permName = urlToPermMap[url.split("/").splice(0, 3).join("/")];
 
+  // 校验 token
 	const { authorization } = ctx.headers;
 	if (!authorization) {
 		createError(UNAUTHORIZED, ctx);
@@ -37,8 +38,9 @@ const authVerify = async (ctx, next) => {
 		createError(UNAUTHORIZED, ctx);
 		return;
 	}
+
 	console.log("解密后的用户信息：", result);
-	ctx.auth = { userInfo: {...result, permName} };
+	ctx.auth = { userInfo: { ...result, permName } };
 	await next();
 };
 
@@ -48,21 +50,21 @@ const authVerify = async (ctx, next) => {
  * @param {*} next
  */
 const permVerify = async (ctx, next) => {
-  console.log("权限校验 Middleware: permVerify");
+	console.log("权限校验 Middleware: permVerify");
 
 	const { roleId, permName } = ctx.auth.userInfo;
-  const result = await queryRolePermission(roleId);
+	const result = await queryRolePermission(roleId);
 
-  if (!result) {
-    createError(INTERNAL_PROBLEMS, ctx);
-    return;
-  }
+	if (!result) {
+		createError(INTERNAL_PROBLEMS, ctx);
+		return;
+	}
 
-  console.log(result, permName);
-  if (!comparePerm(result, permName)) {
-    createError(NO_PERMISSION, ctx);
-    return;
-  }
+	console.log(result, permName);
+	if (!comparePerm(result, permName)) {
+		createError(NO_PERMISSION, ctx);
+		return;
+	}
 
 	await next();
 };
@@ -87,8 +89,19 @@ const passwordVerify = async (ctx, next) => {
 	await next();
 };
 
+/**
+ * @description: 校验初始用户
+ * @param {*} ctx
+ * @param {*} next
+ */
+const initialUserVerify = async (ctx) => {
+	const { wid } = ctx.userInfo;
+  const isInitialUser = wid === INITIAL_USER_ID;
+  return isInitialUser;
+};
+
 module.exports = {
 	authVerify,
 	passwordVerify,
-  permVerify
+	permVerify
 };

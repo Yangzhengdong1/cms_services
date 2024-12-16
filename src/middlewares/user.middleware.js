@@ -1,10 +1,13 @@
+const { INITIAL_USER_ID } = require("@/app/config");
 const {
 	CREATE_USER_ARGUMENT_IS_NOT_EMPTY,
 	ROLE_NOT_FOUND,
 	DEPT_NOT_FOUND,
 	ROLE_AND_DEPT_DO_NOT_MATCH,
 	USER_NOT_FOUND,
-	USER_WID_IS_NOT_EMPTY
+	USER_WID_IS_NOT_EMPTY,
+  USER_CANNOT_BE_DELETED_INITIAL,
+  USER_CANNOT_BE_DELETED_LOGIN
 } = require("@/constant/messages");
 const {
 	createError,
@@ -37,8 +40,16 @@ const validateCondition = async (ctx, wid = "") => {
 		}
 	}
 
-	const { name, realname, password, phone, departmentId, roleId, isActive, avatarUrl } =
-		ctx.request.body;
+	const {
+		name,
+		realname,
+		password,
+		phone,
+		departmentId,
+		roleId,
+		isActive,
+		avatarUrl
+	} = ctx.request.body;
 
 	// 判断必传参数
 	const requiredFields = [name, realname, password, phone];
@@ -59,8 +70,11 @@ const validateCondition = async (ctx, wid = "") => {
 		Object.prototype.toString.call(result) === "[object Array]" &&
 		result.length > 0
 	) {
-		createError(ACCOUNT_ALREADY_EXISTS, ctx);
-		return { isValid: false };
+		// 更新时需排除自身
+		if (!wid || wid !== result[0].wid) {
+			createError(ACCOUNT_ALREADY_EXISTS, ctx);
+			return { isValid: false };
+		}
 	}
 
 	// 查询角色名称
@@ -112,7 +126,7 @@ const validateCondition = async (ctx, wid = "") => {
 		isActive: isActive ? 1 : 0,
 		roleName,
 		departmentName,
-    avatarUrl: avatarUrl ? avatarUrl : ""
+		avatarUrl: avatarUrl ? avatarUrl : ""
 	};
 
 	if (wid) {
@@ -148,6 +162,21 @@ const verifyDelete = async (ctx, next) => {
 	console.log("用户校验 Middleware: verifyDelete~");
 
 	const { id } = ctx.params;
+  const { wid } = ctx.auth.userInfo;
+
+  // 判断删除的用户是否是当前登录用户
+  if (id === wid) {
+    ctx.app.emit("message", USER_CANNOT_BE_DELETED_LOGIN, ctx);
+    return;
+  }
+
+  // 判断删除的用户是否是初始用户
+  if (id === INITIAL_USER_ID) {
+    ctx.app.emit("message", USER_CANNOT_BE_DELETED_INITIAL, ctx);
+    return;
+  }
+
+  // 判断用户是否存在
 	const result = await queryUserExist("wid", id);
 	if (Array.isArray(result) && !result.length) {
 		ctx.app.emit("message", USER_NOT_FOUND, ctx);
@@ -216,8 +245,9 @@ const verifyUserAll = async (ctx, next) => {
 	// 可选参数
 	let {
 		id,
-    status,
+		status,
 		username,
+    realname,
 		roleName,
 		roleId,
 		departmentName,
@@ -228,8 +258,9 @@ const verifyUserAll = async (ctx, next) => {
 	} = ctx.request.body;
 	const optionalParams = {
 		id,
-    status,
+		status,
 		username,
+    realname,
 		roleName,
 		roleId,
 		departmentName,

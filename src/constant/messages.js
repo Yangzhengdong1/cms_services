@@ -13,6 +13,8 @@ const DICT_TABLE_NOT_FOUND = "字典表不存在！";
 
 const USER_NOT_FOUND = "用户不存在！";
 const USER_WID_IS_NOT_EMPTY = "用户id不能为空！";
+const USER_CANNOT_BE_DELETED_LOGIN = "不可删除当前登录用户！";
+const USER_CANNOT_BE_DELETED_INITIAL = "不可删除初始用户！";
 
 
 const ROLE_PERM_ARGUMENT_IS_NOT_EMPTY = "角色id/权限列表参数不能为空!";
@@ -66,5 +68,7 @@ module.exports = {
   MENU_DEPT_ARGUMENT_IS_NOT_EMPTY,
 
   USER_NOT_FOUND,
-  USER_WID_IS_NOT_EMPTY
+  USER_WID_IS_NOT_EMPTY,
+  USER_CANNOT_BE_DELETED_LOGIN,
+  USER_CANNOT_BE_DELETED_INITIAL
 };

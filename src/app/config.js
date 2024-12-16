@@ -25,7 +25,7 @@ module.exports = {
 	MYSQL_USER,
 	MYSQL_PASSWORD,
 	MYSQL_DATABASE,
-  SUPER_ADMIN_ID
+  INITIAL_USER_ID
 } = process.env;
 
 module.exports.VIEWS_PATH = viewsPath;

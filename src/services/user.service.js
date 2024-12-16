@@ -1,4 +1,6 @@
 const connection = require("../app/database");
+const { INITIAL_USER_ID } = require("@/app/config");
+
 const { buildWhereClause } = require("@/utils/format");
 const { queryTableTotal } = require("./public.service");
 
@@ -135,16 +137,20 @@ class UserService {
 			roleId: "role_id = ?",
 			departmentId: "department_id = ?",
 			username: "name LIKE ?",
+			realname: "real_name LIKE ?",
 			roleName: "role_name LIKE ?",
 			departmentName: "department_name LIKE ?",
 			phone: "phone LIKE ?",
 			status: "is_active = ?"
 		};
 
-		const { where, values, limitStatement } = buildWhereClause(
+		let { where, values, limitStatement } = buildWhereClause(
 			params,
 			fieldSqlMap
 		);
+
+    const ignoreWhere = `wid != "${INITIAL_USER_ID}"`;
+    where = where ? `${where} AND ${ignoreWhere}` : `WHERE ${ignoreWhere}`;
 		let statement = `
       SELECT
         wid,
