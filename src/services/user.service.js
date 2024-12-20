@@ -61,7 +61,6 @@ class UserService {
 			wid,
 			username,
 			realname,
-			password,
 			phone,
 			departmentId,
 			roleId,
@@ -74,7 +73,6 @@ class UserService {
       UPDATE users 
       SET name = ?,
           real_name = ?,
-          password = ?,
           phone = ?,
           department_id = ?,
           department_name = ?,
@@ -90,7 +88,6 @@ class UserService {
 			const [result] = await connection.execute(statement, [
 				username,
 				realname,
-				password,
 				phone,
 				departmentId,
 				departmentName,

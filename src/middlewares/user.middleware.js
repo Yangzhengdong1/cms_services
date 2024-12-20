@@ -51,8 +51,8 @@ const validateCondition = async (ctx, wid = "") => {
 		avatarUrl
 	} = ctx.request.body;
 
-	// 判断必传参数
-	const requiredFields = [name, realname, password, phone];
+	// 判断必传参数(更新用户时，无需传递密码)
+	const requiredFields = wid ? [name, realname, phone] : [name, realname, password, phone];
 	const flag = requiredFields.every(item => !!item === true);
 	if (!flag) {
 		ctx.app.emit("message", CREATE_USER_ARGUMENT_IS_NOT_EMPTY, ctx);
@@ -119,19 +119,16 @@ const validateCondition = async (ctx, wid = "") => {
 	const params = {
 		username: name,
 		realname,
-		password: hashEncryption(password),
+		password: wid ? null : hashEncryption(password),
 		phone,
 		departmentId: departmentId ? departmentId : null,
 		roleId: roleId ? roleId : null,
 		isActive: isActive ? 1 : 0,
 		roleName,
 		departmentName,
-		avatarUrl: avatarUrl ? avatarUrl : ""
+		avatarUrl: avatarUrl ? avatarUrl : "",
+    ...(wid && { wid })
 	};
-
-	if (wid) {
-		params.wid = wid;
-	}
 
 	return { isValid, params };
 };
