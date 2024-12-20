@@ -67,7 +67,9 @@ class MenuCoutroller {
 			createError(INTERNAL_PROBLEMS, ctx);
 			return;
 		}
-		const tree = arrayToTree(result);
+		let tree = arrayToTree(result);
+
+    tree = (!departmentId && !isInitialUser) ? [] : tree;
 
 		ctx.body = {
 			code: 0,
