@@ -58,12 +58,12 @@ class PublicController {
 	 */
 	async getDictTable(ctx) {
 		const { name } = ctx.public.dictParams;
-    const { name: queryName } = ctx.params;
+		const { name: queryName } = ctx.params;
 		let fields = name === "levels" ? ["label", "value"] : ["name", "wid"];
 
-    if (queryName === "MENU_TREE" || queryName === "DEPT_TREE") {
-      fields = ["name", "wid", "parent_id AS parentId"];
-    }
+		if (queryName === "MENU_TREE" || queryName === "DEPT_TREE") {
+			fields = ["name", "wid", "parent_id AS parentId"];
+		}
 
 		let result = await queryDictTable(name, fields);
 
@@ -72,9 +72,15 @@ class PublicController {
 			return;
 		}
 
-    if (queryName === "MENU_TREE" || queryName === "DEPT_TREE") {
-      result = arrayToTree(result);
-    }
+		if (queryName === "MENU_TREE" || queryName === "DEPT_TREE") {
+			result = arrayToTree(result);
+		}
+
+		// await new Promise(resolve => {
+		// 	setTimeout(() => {
+		// 		resolve();
+		// 	}, 3000);
+		// });
 
 		ctx.body = {
 			code: 0,

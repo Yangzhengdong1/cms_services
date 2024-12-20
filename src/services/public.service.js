@@ -103,8 +103,9 @@ class PublicService {
 
 	// 查询 total
 	async queryTableTotal(tableName, where = "", values = []) {
-		values = values.slice(0, -2);
+		values = values.length > 3 ? values.slice(0, -2) : values;
 		const statement = `SELECT COUNT(*) AS total FROM ${tableName} ${where};`;
+
 		try {
 			const [result] = await connection.execute(statement, values);
 			return result;

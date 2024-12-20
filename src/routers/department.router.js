@@ -10,6 +10,6 @@ const deptRouter = new KoaRouter({prefix: "/department"});
 deptRouter.post("/create", authVerify, permVerify, verifyCreate, createDepartment);
 deptRouter.delete("/delete/:id", authVerify, permVerify, verifyDelete, deleteDepartment);
 deptRouter.post("/update", authVerify, permVerify, verifyUpdate, updateDepartment);
-deptRouter.post("/get-list", authVerify, permVerify, limitVerify, verifyDeptAll, getDeptAll);
+deptRouter.post("/get-list", authVerify, limitVerify, verifyDeptAll, getDeptAll);
 
 module.exports = deptRouter;

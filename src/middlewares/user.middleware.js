@@ -41,7 +41,7 @@ const validateCondition = async (ctx, wid = "") => {
 	}
 
 	const {
-		name,
+		username: name,
 		realname,
 		password,
 		phone,

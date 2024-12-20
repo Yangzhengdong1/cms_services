@@ -33,7 +33,7 @@ app.use(bodyParser());
 app.use(globalLogger());
 // 开启静态资源服务，提供 uploads 文件夹的访问
 // mount: 提供静态服务访问前缀， koa-static prefix属性被废弃
-app.use(mount("/uploads/imgs/", KoaStatic(path.resolve(__dirname, "../../uploads/imgs/"))));
+app.use(mount("/uploads/imgs/", KoaStatic(path.resolve(__dirname, "../../uploads/imgs/"), { maxage: 2592000000 }))); //静态资源30天缓存 实际上 = 2592000秒
 
 // 注册路由
 app.use(templateRouter.routes());
