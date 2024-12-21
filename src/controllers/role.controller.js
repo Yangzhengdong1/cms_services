@@ -124,7 +124,7 @@ class RoleController {
 
     // 过滤id为 null 的权限
     result = result.map(item => {
-      item.permissions = item.permissions.filter(permission => permission.id !== null);
+      item.permissions = item.permissions.filter(permission => permission.wid !== null);
       return item;
     });
 

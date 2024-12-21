@@ -66,7 +66,7 @@ class RoleService {
         r.name,
         r.description,
         r.department_id AS departmentId,
-				JSON_ARRAYAGG(JSON_OBJECT("id", rp.permission_id, "name", rp.permission_name)) AS permissions,
+				JSON_ARRAYAGG(JSON_OBJECT("wid", rp.permission_id, "name", rp.permission_name)) AS permissions,
         ( SELECT dp.name FROM departments dp WHERE dp.wid = r.department_id ) AS departmentName,
         r.level,
         DATE_FORMAT(r.createAt, '%Y-%m-%d %H:%i:%s') AS createTime,

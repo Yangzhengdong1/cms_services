@@ -12,9 +12,11 @@ class MenuService {
 		if (departmentId) {
 			statement += `
         JOIN department_menus dm 
-        ON menus.wid = dm.menu_id WHERE dm.department_id = ?;`;
+        ON menus.wid = dm.menu_id WHERE dm.department_id = ? `;
 			values = [departmentId];
 		}
+
+    statement += "ORDER BY menus.createAt ASC;";
 
 		try {
 			const [result] = await connection.execute(statement, values);
