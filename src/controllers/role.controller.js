@@ -115,12 +115,19 @@ class RoleController {
 	async getRoleAll(ctx) {
 		const { getListParams } = ctx.role;
 
-		const { result, total, status } = await getRoleList(getListParams);
+		let { result, total, status } = await getRoleList(getListParams);
 
 		if (status) {
 			createError(INTERNAL_PROBLEMS, ctx);
 			return;
 		}
+
+    // 过滤id为 null 的权限
+    result = result.map(item => {
+      item.permissions = item.permissions.filter(permission => permission.id !== null);
+      return item;
+    });
+
 		ctx.body = {
 			code: 0,
 			totalCount: total,

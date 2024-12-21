@@ -62,19 +62,27 @@ class RoleService {
 
 		const statement = `
       SELECT
-        wid,
-        name,
-        description,
-        department_id AS departmentId,
-        ( SELECT name FROM departments WHERE wid = roles.department_id ) AS departmentName,
-        level,
-        DATE_FORMAT(createAt, '%Y-%m-%d %H:%i:%s') AS createTime,
-        DATE_FORMAT(updateAt, '%Y-%m-%d %H:%i:%s') AS updateTime
+        r.wid,
+        r.name,
+        r.description,
+        r.department_id AS departmentId,
+				JSON_ARRAYAGG(JSON_OBJECT("id", rp.permission_id, "name", rp.permission_name)) AS permissions,
+        ( SELECT dp.name FROM departments dp WHERE dp.wid = r.department_id ) AS departmentName,
+        r.level,
+        DATE_FORMAT(r.createAt, '%Y-%m-%d %H:%i:%s') AS createTime,
+        DATE_FORMAT(r.updateAt, '%Y-%m-%d %H:%i:%s') AS updateTime
       FROM
-        roles
+        roles AS r
+				LEFT JOIN role_permissions rp ON rp.role_id = r.wid
         ${where} 
+			GROUP BY
+        r.wid,
+        r.name,
+        r.description,
+        r.department_id,
+        r.level
       ORDER BY
-        updateAt DESC
+        r.updateAt DESC
         ${limitStatement}
       ;
     `;

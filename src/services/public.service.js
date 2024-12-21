@@ -15,7 +15,8 @@ class PublicService {
 	async queryDictTable(name, fields = ["wid", "name"]) {
 		let fieldStr = fields.join(", ");
 		const statement = ` SELECT ${fieldStr} FROM ${name} ORDER BY updateAt DESC;`;
-		try {
+
+    try {
 			const [result] = await connection.execute(statement, []);
 			return result;
 		} catch (error) {
@@ -103,9 +104,11 @@ class PublicService {
 
 	// 查询 total
 	async queryTableTotal(tableName, where = "", values = []) {
-		values = values.length > 3 ? values.slice(0, -2) : values;
+		values = values.length >= 3 ? values.slice(0, -2) : values;
 		const statement = `SELECT COUNT(*) AS total FROM ${tableName} ${where};`;
 
+    console.log(statement, "sssssssss");
+    console.log(values, "sssssssss");
 		try {
 			const [result] = await connection.execute(statement, values);
 			return result;
