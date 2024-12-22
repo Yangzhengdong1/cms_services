@@ -24,6 +24,7 @@ const deptRouter = require("@/routers/department.router");
 const roleRouter = require("@/routers/role.router");
 const uploadRouter = require("@/routers/upload.router");
 const goodsRouter = require("@/routers/goods.router");
+const storyRouter = require("@/routers/story.router");
 
 const app = new Koa();
 
@@ -54,6 +55,8 @@ app.use(uploadRouter.routes());
 app.use(uploadRouter.allowedMethods());
 app.use(goodsRouter.routes());
 app.use(goodsRouter.allowedMethods());
+app.use(storyRouter.routes());
+app.use(storyRouter.allowedMethods());
 
 app.on("error", handleError);
 app.on("message", handleMessage);

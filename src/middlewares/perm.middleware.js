@@ -9,7 +9,9 @@ const {
 const { comparePerm } = require("../constant/permission");
 const {
 	PERM_CREATE_ARGUMENT_IS_NOT_EMPTY,
-	PERM_CREATE_NAME_IS_EXIST
+	PERM_CREATE_NAME_IS_EXIST,
+  PERM_NOT_FOUND,
+  PERM_WID_IS_NOT_EMPTY
 } = require("@/constant/messages");
 const { SUPER_ADMIN_ID } = require("../app/config");
 const { filterOptionalParams } = require("../utils/format");
@@ -63,7 +65,7 @@ const verifyDelete = async (ctx, next) => {
 	const result = await queryPermission("wid", id);
 
 	if (Array.isArray(result) && !result.length) {
-		ctx.app.emit("message", "权限不存在！", ctx);
+		ctx.app.emit("message", PERM_NOT_FOUND, ctx);
 		return;
 	}
 
@@ -76,14 +78,14 @@ const verifyUpdate = async (ctx, next) => {
 	let { wid, description } = ctx.request.body;
 
 	if (!wid) {
-		ctx.app.emit("message", "wid不能为空！", ctx);
+		ctx.app.emit("message", PERM_WID_IS_NOT_EMPTY, ctx);
 		return;
 	}
 
 	const result = await queryPermission("wid", wid);
 
 	if (Array.isArray(result) && !result.length) {
-		ctx.app.emit("message", "wid不存在！", ctx);
+		ctx.app.emit("message", PERM_NOT_FOUND, ctx);
 		return;
 	}
 
