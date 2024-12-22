@@ -12,6 +12,7 @@ const {
 	PERM_CREATE_NAME_IS_EXIST
 } = require("@/constant/messages");
 const { SUPER_ADMIN_ID } = require("../app/config");
+const { filterOptionalParams } = require("../utils/format");
 
 /**
  * @description: 处理权限创建参数（权限名称不允许重复/必填参数：name）
@@ -19,7 +20,7 @@ const { SUPER_ADMIN_ID } = require("../app/config");
  * @param {*} next
  */
 const verifyCreate = async (ctx, next) => {
-	console.log("用户权限校验 Middleware: verifyCreate~");
+	console.log("系统权限校验 Middleware: verifyCreate~");
 
 	const { name, description } = ctx.request.body;
 	if (!name) {
@@ -44,6 +45,76 @@ const verifyCreate = async (ctx, next) => {
 	await next();
 };
 
+const verifyDelete = async (ctx, next) => {
+	console.log("系统权限校验 Middleware: verifyDelete~");
+
+  const flag = true;
+  if (flag) {
+    ctx.body = {
+      code: -1,
+      message: "暂不支持删除权限"
+    };
+    return;
+  }
+
+
+	const { id } = ctx.params;
+
+	const result = await queryPermission("wid", id);
+
+	if (Array.isArray(result) && !result.length) {
+		ctx.app.emit("message", "权限不存在！", ctx);
+		return;
+	}
+
+	await next();
+};
+
+const verifyUpdate = async (ctx, next) => {
+	console.log("系统权限校验 Middleware: verifyUpdate~");
+
+	let { wid, description } = ctx.request.body;
+
+	if (!wid) {
+		ctx.app.emit("message", "wid不能为空！", ctx);
+		return;
+	}
+
+	const result = await queryPermission("wid", wid);
+
+	if (Array.isArray(result) && !result.length) {
+		ctx.app.emit("message", "wid不存在！", ctx);
+		return;
+	}
+
+	if (description === null || typeof description === "undefined") {
+		description = "";
+	}
+
+	ctx.perm = { updateParams: { description, wid } };
+
+	await next();
+};
+
+const verifyPermAll = async (ctx, next) => {
+	console.log("系统权限校验 Middleware: verifyPermAll~");
+
+	const { limitParams } = ctx.public;
+
+	const { permissionName, description, startTime, endTime } = ctx.request.body;
+
+	const optionalParams = filterOptionalParams({
+		permissionName,
+		description,
+		startTime,
+		endTime
+	});
+
+  const params = { ...optionalParams, ...limitParams };
+  ctx.perm = { getListParams: params };
+
+	await next();
+};
 
 /**
  * @description: 判断当前角色是否有操作权限的权限/当前用户是否为超级管理员
@@ -71,5 +142,8 @@ const permOperationVerify = async (ctx, next) => {
 
 module.exports = {
 	verifyCreate,
-  permOperationVerify
+	verifyDelete,
+	verifyUpdate,
+	verifyPermAll,
+	permOperationVerify
 };
