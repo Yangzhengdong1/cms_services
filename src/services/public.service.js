@@ -107,8 +107,6 @@ class PublicService {
 		values = values.length >= 3 ? values.slice(0, -2) : values;
 		const statement = `SELECT COUNT(*) AS total FROM ${tableName} ${where};`;
 
-    console.log(statement, "sssssssss");
-    console.log(values, "sssssssss");
 		try {
 			const [result] = await connection.execute(statement, values);
 			return result;

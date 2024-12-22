@@ -57,7 +57,16 @@ class PermissionService {
 		);
 
     const statement = `
-      SELECT wid, name, description FROM permissions ${where} ORDER BY name ASC ${limitStatement}
+      SELECT 
+        wid,
+        name,
+        description,
+        DATE_FORMAT(createAt, "%Y-%m-%d %h:%i:%s") AS createTime,
+        DATE_FORMAT(updateAt, "%Y-%m-%d %h:%i:%s") AS updateTime
+      FROM permissions
+      ${where}
+      ORDER BY updateAt DESC
+      ${limitStatement}
     `;
 
     try {

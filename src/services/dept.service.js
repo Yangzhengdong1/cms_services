@@ -1,4 +1,6 @@
 const connection = require("../app/database");
+const { INITIAL_USER_ID } = require("@/app/config");
+
 const { buildWhereClause } = require("../utils/format");
 const { queryTableTotal, removeMenuDept } = require("./public.service");
 
@@ -86,6 +88,7 @@ class DepartmentService {
               users u 
             WHERE
               u.department_id = d1.wid 
+              AND u.wid != '${INITIAL_USER_ID}'
           ),
           JSON_ARRAY()
         ) AS users,
