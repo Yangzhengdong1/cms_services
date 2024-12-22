@@ -95,12 +95,17 @@ class DepartmentService {
 
 	async getDeptAll(ctx) {
 		const { getListParams } = ctx.department;
-		const { result, total, status } = await getDepartmentList(getListParams);
+		let { result, total, status } = await getDepartmentList(getListParams);
 
 		if (status) {
 			createError(INTERNAL_PROBLEMS, ctx);
 			return;
 		}
+
+    result = result.map(dept => {
+      dept.menus = dept.menus.filter(menu => menu.wid !== null);
+      return dept;
+    });
 
 		ctx.body = {
 			code: 0,

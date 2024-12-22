@@ -61,9 +61,9 @@ class DepartmentService {
 
 	async getDepartmentList(params) {
 		const fieldSqlMap = {
-			id: "wid = ?",
-			parentId: "parent_id = ?",
-			departmentName: "name LIKE ?"
+			id: "d1.wid = ?",
+			parentId: "d1.parent_id = ?",
+			departmentName: "d1.name LIKE ?"
 		};
 
 		const { where, values, limitStatement } = buildWhereClause(
@@ -73,20 +73,53 @@ class DepartmentService {
 
 		const statement = `
       SELECT
-	      wid,
-	      NAME,
-	      parent_id AS parentId,
-        DATE_FORMAT( createAt, '%Y-%m-%d %H:%i:%s' ) AS createTime,
-	      DATE_FORMAT( updateAt, '%Y-%m-%d %H:%i:%s' ) AS updateTime 
+        d1.wid,
+        d1.name,
+        d1.parent_id AS parentId,
+        d2.name AS parentName,
+        -- 独立查询 Users 聚合结果
+        COALESCE(
+          (
+            SELECT
+              JSON_ARRAYAGG( JSON_OBJECT( "wid", u.wid, "name", u.real_name ) ) 
+            FROM
+              users u 
+            WHERE
+              u.department_id = d1.wid 
+          ),
+          JSON_ARRAY()
+        ) AS users,
+        -- 独立查询 Roles 聚合结果
+        COALESCE(
+          (
+            SELECT
+              JSON_ARRAYAGG( JSON_OBJECT( "wid", r.wid, "name", r.name, "level", r.level ) ) 
+            FROM
+              roles r 
+            WHERE
+              r.department_id = d1.wid
+          ),
+          JSON_ARRAY()
+        ) AS roles,
+        JSON_ARRAYAGG(JSON_OBJECT("wid", dm.menu_id, "name", dm.menu_name)) AS menus,
+        DATE_FORMAT( d1.createAt, '%Y-%m-%d %H:%i:%s' ) AS createTime,
+        DATE_FORMAT( d1.updateAt, '%Y-%m-%d %H:%i:%s' ) AS updateTime 
       FROM
-	      departments
-        ${where}
+        departments d1
+        LEFT JOIN departments d2 ON d1.parent_id = d2.wid
+        LEFT JOIN department_menus dm ON d1.wid = dm.department_id
+      ${where}
+      GROUP BY
+        d1.wid,
+        d1.name,
+        d1.parent_id,
+        d2.name 
       ORDER BY
-	      createAt DESC
+	      d1.createAt DESC
         ${limitStatement}`;
 
 		try {
-			const [totalResult] = await queryTableTotal("departments", where, values);
+			const [totalResult] = await queryTableTotal("departments d1", where, values);
 			const [result] = await connection.execute(statement, values);
 			return { result, total: totalResult.total };
 		} catch (error) {
