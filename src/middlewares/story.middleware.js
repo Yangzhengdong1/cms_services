@@ -1,4 +1,5 @@
 const { STORY_ARGUMENT_IS_NOT_EMPTY } = require("@/constant/messages");
+const { filterOptionalParams } = require("../utils/format");
 
 const verifyCreate = async (ctx, next) => {
 	const { wid } = ctx.auth.userInfo;
@@ -21,6 +22,20 @@ const verifyCreate = async (ctx, next) => {
 	await next();
 };
 
+const verifyStoryAll = async (ctx, next) => {
+	const { limitParams } = ctx.public;
+  const { content, utterer, startTime, endTime } = ctx.request.body;
+  const optionalParams = filterOptionalParams({
+    content, utterer, startTime, endTime
+  });
+
+  const params = { ...optionalParams, ...limitParams };
+  ctx.story = { getListParams: params };
+
+	await next();
+};
+
 module.exports = {
-	verifyCreate
+	verifyCreate,
+	verifyStoryAll
 };
