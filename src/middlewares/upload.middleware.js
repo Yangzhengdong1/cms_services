@@ -1,6 +1,7 @@
 const multer = require("koa-multer");
 const path = require("path");
-const { createError, NO_PERMISSION } = require("../constant/error-types");
+// const { createError, NO_PERMISSION } = require("../constant/error-types");
+const { UPLOAD_NO_PERMISSION } = require("@/constant/messages");
 
 const storage = multer.diskStorage({
 	destination: (req, file, cb) =>
@@ -32,7 +33,8 @@ const verifyUpload = async (ctx, next) => {
   // 由于图片是放在项目文件夹下存储的，所以需要限制上传，不限制的话内存可能会爆炸
 	const { isInitialUser } = ctx.auth.userInfo;
 	if (!isInitialUser) {
-		createError(NO_PERMISSION, ctx);
+		// createError(NO_PERMISSION, ctx);
+    ctx.app.emit("message", UPLOAD_NO_PERMISSION, ctx);
 		return;
 	}
 

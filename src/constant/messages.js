@@ -36,6 +36,8 @@ const DEPT_WID_IS_NOT_EMPTY = "部门id不能为空！";
 
 const STORY_ARGUMENT_IS_NOT_EMPTY = "内容不能为空！";
 
+const UPLOAD_NO_PERMISSION = "服务器空间不足，暂无法上传！";
+
 
 const MENU_DEPT_ARGUMENT_IS_NOT_EMPTY = "部门id/菜单列表不能为空！";
 const ROLE_AND_DEPT_DO_NOT_MATCH = "角色与部门不匹配！";
@@ -77,6 +79,8 @@ module.exports = {
   USER_CANNOT_BE_DELETED_INITIAL,
 
   STORY_ARGUMENT_IS_NOT_EMPTY,
+
+  UPLOAD_NO_PERMISSION,
 
 	ROLE_AND_DEPT_DO_NOT_MATCH,
 	DICT_TABLE_NOT_FOUND

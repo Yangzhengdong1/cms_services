@@ -104,13 +104,14 @@ class DepartmentService {
           ),
           JSON_ARRAY()
         ) AS roles,
-        JSON_ARRAYAGG(JSON_OBJECT("wid", dm.menu_id, "name", dm.menu_name)) AS menus,
+        JSON_ARRAYAGG(JSON_OBJECT("wid", dm.menu_id, "name", dm.menu_name, "parentId", m.parent_id)) AS menus,
         DATE_FORMAT( d1.createAt, '%Y-%m-%d %H:%i:%s' ) AS createTime,
         DATE_FORMAT( d1.updateAt, '%Y-%m-%d %H:%i:%s' ) AS updateTime 
       FROM
         departments d1
         LEFT JOIN departments d2 ON d1.parent_id = d2.wid
         LEFT JOIN department_menus dm ON d1.wid = dm.department_id
+        LEFT JOIN menus m ON m.wid = dm.menu_id
       ${where}
       GROUP BY
         d1.wid,

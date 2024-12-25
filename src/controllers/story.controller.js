@@ -30,17 +30,23 @@ class StoryController {
 			return;
 		}
 
+		// await new Promise(resolve => {
+		// 	setTimeout(() => {
+		// 		resolve("success");
+		// 	}, 4000);
+		// });
+
 		// 转化时间
 		const storys = result.map(item => {
 			const timeAgo = timeAgoFormat(new Date(item.createTime));
-      item.timeAgo = timeAgo;
-      return item;
+			item.timeAgo = timeAgo;
+			return item;
 		});
 
 		ctx.body = {
 			code: 0,
 			totalCount: total,
-			lsit: storys,
+			list: storys,
 			message: "查询成功~"
 		};
 	}
