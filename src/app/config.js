@@ -17,7 +17,7 @@ const publicKey = fs.readFileSync(resolve("./keys/public.key", "utf8"));
 dotenv.config({ path: devPath });
 
 module.exports = {
-	SERVICE_PROT,
+	SERVICE_PORT,
 	SERVICE_NAME,
   SERVICE_HOST,
 	MYSQL_HOST,
@@ -25,7 +25,10 @@ module.exports = {
 	MYSQL_USER,
 	MYSQL_PASSWORD,
 	MYSQL_DATABASE,
-  INITIAL_USER_ID
+  INITIAL_USER_ID,
+  GITHUB_OWNER,
+  GITHUB_REPO,
+  GITHUB_TOKEN
 } = process.env;
 
 module.exports.VIEWS_PATH = viewsPath;

@@ -1,6 +1,11 @@
 const path = require("path");
 const fs = require("fs");
 const { SERVICE_HOST, SERVICE_PROT } = require("../app/config");
+const { uploadFileToGithub } = require("../utils/octokit");
+const {
+	createError,
+	THIRD_PARTY_INTERFACE_ERROR
+} = require("../constant/error-types");
 
 class UploadController {
 	async uploadImg(ctx) {
@@ -49,6 +54,31 @@ class UploadController {
 			ctx.body = {
 				code: -1,
 				message: "文件不存在！"
+			};
+		}
+	}
+
+	async uploadImgCloud(ctx) {
+		try {
+			const { file } = ctx.req;
+      let filename = file.originalname;
+			// filename = `${+new Date()}_${file.originalname}`;
+			const fileContent = file.buffer.toString("base64");
+			const res = await uploadFileToGithub(filename, fileContent);
+      if (res && (res.status === 201 || res.status === 200)) {
+				const url = res.data.content.download_url;
+				const fileInfo = { url, filename, size: file.size };
+				ctx.body = {
+					code: 0,
+					data: fileInfo
+				};
+			} else {
+				createError(THIRD_PARTY_INTERFACE_ERROR, ctx);
+			}
+		} catch (error) {
+			ctx.body = {
+				code: -1,
+				message: error.message
 			};
 		}
 	}

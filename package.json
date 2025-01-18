@@ -14,6 +14,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@octokit/rest": "^18.12.0",
+    "axios": "^1.7.9",
     "bcrypt": "^5.1.1",
     "dayjs": "^1.11.13",
     "dotenv": "^16.4.5",

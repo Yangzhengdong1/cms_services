@@ -1,6 +1,6 @@
 const app = require("./app");
-const { SERVICE_PROT, SERVICE_HOST } = require("./app/config");
+const { SERVICE_PORT, SERVICE_HOST } = require("./app/config");
 
-app.listen(SERVICE_PROT || 8000, () => {
-	console.log(`${SERVICE_HOST}:${SERVICE_PROT} \n服务启动成功~`);
+app.listen(SERVICE_PORT || 8000, () => {
+	console.log(`${SERVICE_HOST}:${SERVICE_PORT} \n ( *・ω・)✄╰ひ╯ 服务启动成功~`);
 });
