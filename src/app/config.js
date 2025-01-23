@@ -28,7 +28,8 @@ module.exports = {
   INITIAL_USER_ID,
   GITHUB_OWNER,
   GITHUB_REPO,
-  GITHUB_TOKEN
+  GITHUB_TOKEN,
+  GITHUB_PROXY
 } = process.env;
 
 module.exports.VIEWS_PATH = viewsPath;

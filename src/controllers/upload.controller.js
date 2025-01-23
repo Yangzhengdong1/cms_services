@@ -1,16 +1,18 @@
 const path = require("path");
 const fs = require("fs");
-const { SERVICE_HOST, SERVICE_PROT } = require("../app/config");
+const { SERVICE_HOST, SERVICE_PORT } = require("../app/config");
 const { uploadFileToGithub } = require("../utils/octokit");
+const { GITHUB_OWNER, GITHUB_REPO, GITHUB_PROXY } = require("@/app/config");
+
 const {
 	createError,
 	THIRD_PARTY_INTERFACE_ERROR
 } = require("../constant/error-types");
 
 class UploadController {
-	async uploadImg(ctx) {
+	async uploadImgLocal(ctx) {
+    console.log("本地存储上传~");
 		const { file } = ctx.req;
-		console.log(file);
 		let code = -1;
 		let message = "上传失败！";
 		let data = {};
@@ -23,7 +25,7 @@ class UploadController {
 				filename,
 				size,
 				mimetype,
-				url: `${SERVICE_HOST}:${SERVICE_PROT}/uploads/imgs/${filename}`
+				url: `${SERVICE_HOST}:${SERVICE_PORT}/uploads/imgs/${filename}`
 			};
 		}
 
@@ -60,14 +62,18 @@ class UploadController {
 
 	async uploadImgCloud(ctx) {
 		try {
+      console.log("云存储上传~");
 			const { file } = ctx.req;
       let filename = file.originalname;
 			// filename = `${+new Date()}_${file.originalname}`;
 			const fileContent = file.buffer.toString("base64");
 			const res = await uploadFileToGithub(filename, fileContent);
       if (res && (res.status === 201 || res.status === 200)) {
-				const url = res.data.content.download_url;
-				const fileInfo = { url, filename, size: file.size };
+        // 原始链接
+				// const originalUrl = res.data.content.download_url;
+        // 使用 jsdeliver 加速后的链接
+        const proxyUrl = `${GITHUB_PROXY}/${GITHUB_OWNER}/${GITHUB_REPO}/imgs/${file.originalname}`;
+				const fileInfo = { url: proxyUrl, filename, size: file.size };
 				ctx.body = {
 					code: 0,
 					data: fileInfo

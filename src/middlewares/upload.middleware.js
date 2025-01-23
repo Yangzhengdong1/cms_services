@@ -23,13 +23,13 @@ const storage = multer.diskStorage({
 const upload = multer({
 	storage: storage,
 	limits: {
-		fileSize: 1 * 1024 * 1024 // 设置每个文件最大为 5MB
+		fileSize: 1 * 1024 * 1024 // 设置每个文件最大为 1MB
 	}
 });
 const upload2 = multer({
 	storage: multer.memoryStorage(),
 	limits: {
-		fileSize: 1 * 1024 * 1024 // 设置每个文件最大为 5MB
+		fileSize: 10 * 1024 * 1024 // 设置每个文件最大为 1MB
 	}
 });
 
