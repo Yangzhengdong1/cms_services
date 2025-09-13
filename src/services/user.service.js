@@ -3,8 +3,22 @@ const { INITIAL_USER_ID } = require("@/app/config");
 
 const { buildWhereClause } = require("@/utils/format");
 const { queryTableTotal } = require("./public.service");
+const { buildInsertParams } = require("@/utils/sql-builder");
 
 class UserService {
+	TABLE_FIELD_MAP = {
+		name: "name",
+		realName: "real_name",
+		password: "password",
+		phone: "phone",
+		departmentId: "department_id",
+		roleId: "role_id",
+		isActive: "is_active",
+		roleName: "role_name",
+		departmentName: "department_name",
+		avatarUrl: "avatar_url"
+	};
+
 	async create(params) {
 		const {
 			username,
@@ -41,6 +55,21 @@ class UserService {
 			return result;
 		} catch (err) {
 			console.log(err, "数据库插入用户出错-db");
+			return false;
+		}
+	}
+
+	async createV2(params) {
+		try {
+			const { keysPlaceholder, valsplaceholder, values } = buildInsertParams(
+				this.TABLE_FIELD_MAP,
+				params
+			);
+			const statement = `INSERT INTO users (${keysPlaceholder}) VALUES(${valsplaceholder});`;
+			const [result] = await connection.execute(statement, values);
+			return result;
+		} catch (error) {
+			console.log(error, "创建用户出错");
 			return false;
 		}
 	}
@@ -146,8 +175,8 @@ class UserService {
 			fieldSqlMap
 		);
 
-    const ignoreWhere = `wid != "${INITIAL_USER_ID}"`;
-    where = where ? `${where} AND ${ignoreWhere}` : `WHERE ${ignoreWhere}`;
+		const ignoreWhere = `wid != "${INITIAL_USER_ID}"`;
+		where = where ? `${where} AND ${ignoreWhere}` : `WHERE ${ignoreWhere}`;
 		let statement = `
       SELECT
         wid,
