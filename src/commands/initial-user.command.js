@@ -25,10 +25,20 @@ const execute = async () => {
 			default: ""
 		}
 	]);
+  const { phone } = await prompt([
+		{
+			type: "input",
+			name: "phone",
+			message: "请输入初始用户手机号:",
+			default: ""
+		}
+	]);
 	console.log("初始用户参数：", username, password, hashEncryption(password));
 	return {
 		password: hashEncryption(password),
-		username
+		username,
+    realName: username,
+    phone
 	};
 };
 
@@ -36,8 +46,10 @@ program
 	.command("create")
 	.description("生成系统初始用户命令")
 	.action(async () => {
-		const { username, password } = await execute();
-    await createV2({ name: username, password });
+		const { username, password, phone } = await execute();
+    await createV2({ name: username, password, realName: username, phone });
+    console.log("创建初始用户成功~");
+    process.exit(0);
 	});
 
 program

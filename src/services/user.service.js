@@ -6,7 +6,7 @@ const { queryTableTotal } = require("./public.service");
 const { buildInsertParams } = require("@/utils/sql-builder");
 
 class UserService {
-	TABLE_FIELD_MAP = {
+	static TABLE_FIELD_MAP = {
 		name: "name",
 		realName: "real_name",
 		password: "password",
@@ -62,7 +62,7 @@ class UserService {
 	async createV2(params) {
 		try {
 			const { keysPlaceholder, valsplaceholder, values } = buildInsertParams(
-				this.TABLE_FIELD_MAP,
+				UserService.TABLE_FIELD_MAP,
 				params
 			);
 			const statement = `INSERT INTO users (${keysPlaceholder}) VALUES(${valsplaceholder});`;
