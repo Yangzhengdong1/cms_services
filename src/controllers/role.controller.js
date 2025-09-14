@@ -1,5 +1,5 @@
 const { createError, INTERNAL_PROBLEMS } = require("../constant/error-types");
-const { queryRolePermission } = require("../services/auth.service");
+const { queryRolePermission, queryAllPermission } = require("../services/auth.service");
 const { rolePerm } = require("../services/public.service");
 
 const {
@@ -94,9 +94,9 @@ class RoleController {
 	}
 
 	async getPermossionList(ctx) {
-		const { roleId } = ctx.auth.userInfo;
+		const { roleId, isInitialUser } = ctx.auth.userInfo;
 
-		let result = await queryRolePermission(roleId);
+		let result = isInitialUser ? await queryRolePermission(roleId) : await queryAllPermission();
 
 		if (!result) {
 			createError(INTERNAL_PROBLEMS, ctx);
