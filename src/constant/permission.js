@@ -73,6 +73,7 @@ const urlToPermMap = {
 	"/goods/get-list": GOODS_QUERY,
 
 	"/upload/upload-img": UPLOAD_IMG,
+	"/upload/upload-img-v2": UPLOAD_IMG,
 	"/upload/file": UPLOAD_FILE
 };
 

@@ -3,7 +3,7 @@ const { INITIAL_USER_ID } = require("@/app/config");
 
 const { buildWhereClause } = require("@/utils/format");
 const { queryTableTotal } = require("./public.service");
-const { buildInsertParams } = require("@/utils/sql-builder");
+const { buildInsertParams, buildUpdateParams } = require("@/utils/sql-builder");
 
 class UserService {
 	static TABLE_FIELD_MAP = {
@@ -131,6 +131,23 @@ class UserService {
 			console.log(error, "修改用户出错-db");
 			return false;
 		}
+	}
+
+	async modify(params) {
+		const { values, keysPlaceholder } = buildUpdateParams(
+			UserService.TABLE_FIELD_MAP,
+			params
+		);
+    const statement = `UPDATE users SET ${keysPlaceholder} WHERE wid = ?;`;
+    values.push(params.wid);
+
+    try {
+      const [result] = await connection.execute(statement, values);
+      return result;
+    } catch (error) {
+      console.log(error, "修改用户出错-db");
+      return false;
+    }
 	}
 
 	/**

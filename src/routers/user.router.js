@@ -1,9 +1,9 @@
 const KoaRouter = require("koa-router");
 
-const { authVerify, permVerify } = require("@/middlewares/auth.middleware");
+const { authVerify, permVerify, tokenVerify } = require("@/middlewares/auth.middleware");
 const { limitVerify } = require("../middlewares/public.middleware");
-const { verifyCreate, verifyInfo, verifyUserAll, verifyDelete, verifyUpdate } = require("@/middlewares/user.middleware");
-const { createUser, getUserInfo, getUserAll, deleteUser, updateUser } = require("@/controllers/user.controller");
+const { verifyCreate, verifyInfo, verifyUserAll, verifyDelete, verifyUpdate, verifyModify } = require("@/middlewares/user.middleware");
+const { createUser, getUserInfo, getUserAll, deleteUser, updateUser, modifyUser } = require("@/controllers/user.controller");
 
 const userRouter = new KoaRouter({prefix: "/user"});
 
@@ -12,5 +12,6 @@ userRouter.delete("/delete/:id", authVerify, permVerify, verifyDelete, deleteUse
 userRouter.post("/update", authVerify, permVerify, verifyUpdate, updateUser);
 userRouter.get("/info/:id", authVerify, verifyInfo, getUserInfo);
 userRouter.post("/get-list", authVerify, limitVerify, verifyUserAll, getUserAll);
+userRouter.post("/user-center-modify", tokenVerify, verifyModify, modifyUser);
 
 module.exports = userRouter;

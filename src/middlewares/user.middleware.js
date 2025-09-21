@@ -1,6 +1,7 @@
 const { INITIAL_USER_ID } = require("@/app/config");
 const {
 	CREATE_USER_ARGUMENT_IS_NOT_EMPTY,
+  MDOIFY_USER_ARGUMENT_IS_NOT_EMPTY,
 	ROLE_NOT_FOUND,
 	DEPT_NOT_FOUND,
 	ROLE_AND_DEPT_DO_NOT_MATCH,
@@ -287,10 +288,37 @@ const verifyUserAll = async (ctx, next) => {
 	await next();
 };
 
+const verifyModify = async (ctx, next) => {
+  console.log("用户校验 Middleware: verifyModify~");
+  const { wid } = ctx.auth.userInfo;
+  const { nickname, password, avatarUrl } = ctx.request.body;
+
+  if (!wid) {
+    ctx.app.emit("message", USER_WID_IS_NOT_EMPTY, ctx);
+    return;
+  }
+
+  if (!nickname) {
+    ctx.app.emit("message", MDOIFY_USER_ARGUMENT_IS_NOT_EMPTY, ctx);
+    return;
+  }
+
+  ctx.user = {
+    modifyParams: {
+      wid, name: nickname,
+      ...(avatarUrl && { avatarUrl }),
+      ...(password && { password: hashEncryption(password) })
+    }
+  };
+
+  await next();
+};
+
 module.exports = {
 	verifyCreate,
 	verifyDelete,
 	verifyUpdate,
 	verifyInfo,
-	verifyUserAll
+	verifyUserAll,
+  verifyModify
 };

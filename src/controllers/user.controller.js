@@ -5,7 +5,8 @@ const {
 	remove,
 	update,
 	queryUserExist,
-	getUserList
+	getUserList,
+  modify
 } = require("../services/user.service");
 
 class UserController {
@@ -110,6 +111,20 @@ class UserController {
 			pageSize: result.length,
 			list: result,
 			message: "查询成功~"
+		};
+	}
+
+	async modifyUser(ctx) {
+		const { modifyParams } = ctx.user;
+
+		const result = await modify(modifyParams);
+		if (!result) {
+			createError(INTERNAL_PROBLEMS, ctx);
+			return;
+		}
+		ctx.body = {
+			code: 0,
+			message: "修改成功~"
 		};
 	}
 }

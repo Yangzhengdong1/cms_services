@@ -1,5 +1,5 @@
 class SQLBuilder {
-	buildInsertParams = (tableFieldMap, params) => {
+	filterParams = (tableFieldMap, params) => {
 		const values = [];
 		let fieldKeys = [];
 
@@ -10,7 +10,11 @@ class SQLBuilder {
 				values.push(params[key]);
 			}
 		});
+		return { fieldKeys, values };
+	};
 
+	buildInsertParams = (tableFieldMap, params) => {
+		const { fieldKeys, values } = this.filterParams(tableFieldMap, params);
 		// values 占位符
 		const valsplaceholder = fieldKeys.map(() => "?").join(", ");
 		// keys 占位符
@@ -19,6 +23,18 @@ class SQLBuilder {
 			fieldKeys,
 			values,
 			valsplaceholder,
+			keysPlaceholder
+		};
+	};
+
+	buildUpdateParams = (tableFieldMap, params) => {
+		const { fieldKeys, values } = this.filterParams(tableFieldMap, params);
+
+		const keysPlaceholder = fieldKeys.map(key => `${key} = ?`).join(", ");
+
+		return {
+			fieldKeys,
+			values,
 			keysPlaceholder
 		};
 	};
