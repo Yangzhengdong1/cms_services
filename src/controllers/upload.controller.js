@@ -2,7 +2,8 @@ const path = require("path");
 const fs = require("fs");
 const { SERVICE_HOST, SERVICE_PORT } = require("../app/config");
 const { uploadFileToGithub } = require("../utils/octokit");
-const { GITHUB_OWNER, GITHUB_REPO, GITHUB_PROXY } = require("@/app/config");
+const { GITHUB_OWNER, GITHUB_REPO, GITHUB_PROXY, GITHUB_TOKEN } = require("@/app/config");
+const fileService = require("../services/file.service");
 
 const {
 	createError,
@@ -64,13 +65,14 @@ class UploadController {
 		try {
       console.log("云存储上传~");
 			const { file } = ctx.req;
+      const { wid, username } = ctx.auth.userInfo;
       let filename = file.originalname;
 			// filename = `${+new Date()}_${file.originalname}`;
 			const fileContent = file.buffer.toString("base64");
 			const res = await uploadFileToGithub(filename, fileContent);
       if (res && (res.status === 201 || res.status === 200)) {
         // 原始链接
-				// const originalUrl = res.data.content.download_url;
+				const originalUrl = res.data.content.download_url;
         // 使用 jsdeliver 加速后的链接
         const proxyUrl = `${GITHUB_PROXY}/${GITHUB_OWNER}/${GITHUB_REPO}/imgs/${file.originalname}`;
 				const fileInfo = { url: proxyUrl, filename, size: file.size };
@@ -78,6 +80,21 @@ class UploadController {
 					code: 0,
 					data: fileInfo
 				};
+
+        // 保存文件信息到数据库
+        const params = {
+          url: originalUrl,
+          proxyUrl,
+          fileName: filename,
+          fileSize: file.size,
+          fileType: path.extname(filename).replace(".", ""),
+          token: GITHUB_TOKEN,
+          repo: GITHUB_REPO,
+          owner: GITHUB_OWNER,
+          createdId: wid,
+          createdBy: username
+        };
+        fileService.create(params);
 			} else {
 				createError(THIRD_PARTY_INTERFACE_ERROR, ctx);
 			}
